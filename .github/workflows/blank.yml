@@ -1,0 +1,36 @@
+name: Auto PR from Issues
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+  workflow_dispatch:
+
+jobs:
+  process_issue:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate code from issue
+        run: |
+          echo "Processing issue..." # Здесь будет вызов ChatGPT API для генерации кода
+          echo "Generated code" > new_code.txt
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git checkout -B dev
+          mv new_code.txt generated_code.txt
+          git add generated_code.txt
+          git commit -m "Auto-generated code from issue"
+          git push origin dev
+
+      - name: Create or update PR
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: dev
+          title: "Automated PR from Issues"
+          body: "This PR contains auto-generated code based on GitHub Issues."
+          labels: automated, pending-review
