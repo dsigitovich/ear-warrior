@@ -22,6 +22,7 @@ headers = {
     "Content-Type": "application/json"
 }
 data = {
+    "model": "grok-3",  # Добавлено обязательное поле model (уточните точное имя)
     "prompt": (
         f"Generate code to solve the following problem: {issue_body}. "
         "Return the result as a JSON object where each key is a filename (e.g., 'main.py', 'utils.js') "
