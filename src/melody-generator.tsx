@@ -27,7 +27,7 @@ export async function playMelody() {
     let time = 0;
     melody.forEach((note) => {
         synth.triggerAttackRelease(note, '8n', time); // Каждая нота длится 1/8
-        time += 0.5; // Интервал между нотами (0.5 сек)
+        time += 1; // Интервал между нотами (0.5 сек)
     });
 
     console.log('Generated melody:', melody); // Для отладки
