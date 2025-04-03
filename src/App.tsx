@@ -76,11 +76,11 @@ function App() {
 
             refs.workletNodeRef.current = new AudioWorkletNode(refs.audioContextRef.current, 'pitch-processor');
             refs.microphoneRef.current.connect(refs.workletNodeRef.current);
-            refs.workletNodeRef.current.port.onmessage = (e: MessageEvent<{ pitch: number }>) => {
+            refs.workletNodeRef.current.port.onmessage = (e: MessageEvent<{ pitch: number | null }>) => {
                 const { pitch } = e.data;
-                if (pitch && state.isRecording) {
+                if (pitch !== null && state.isRecording) {
                     const detectedNote = findClosestNote(pitch);
-                    console.log('Detected note:', detectedNote);
+                    console.log('Detected pitch:', pitch, 'Detected note:', detectedNote);
 
                     if (state.melody.length > 0) {
                         const expectedNote = state.melody[0];
@@ -89,6 +89,8 @@ function App() {
                             setState((prev) => ({ ...prev, score: prev.score + 10, melody: prev.melody.slice(1) }));
                         }
                     }
+                } else {
+                    console.log('No pitch detected');
                 }
             };
 
@@ -136,7 +138,10 @@ function App() {
 
     // Преобразование частоты в ноту
     const findClosestNote = (frequency: number): Note | null => {
-        if (!frequency) return null;
+        if (!frequency || isNaN(frequency)) {
+            console.log('Invalid frequency:', frequency);
+            return null;
+        }
         const noteFrequencies = notes.map(note => Tone.Frequency(note).toFrequency());
         const closest = noteFrequencies.reduce((prev, curr) =>
             Math.abs(curr - frequency) < Math.abs(prev - frequency) ? curr : prev
