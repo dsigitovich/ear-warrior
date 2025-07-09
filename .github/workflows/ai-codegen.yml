@@ -1,0 +1,35 @@
+name: AI Code Generator on Issue
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  analyze-issue:
+    if: contains(github.event.issue.labels.*.name, 'ai-task')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          pip install -r .github/ai-pr/requirements.txt
+
+      - name: Run AI PR generator
+        run: |
+          python .github/ai-pr/main.py
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          REPO_NAME: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          BRANCH_PREFIX: ai-fix
