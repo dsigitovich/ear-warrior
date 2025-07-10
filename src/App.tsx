@@ -59,6 +59,8 @@ const App: React.FC = () => {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [lastPitch, setLastPitch] = useState<number | null>(null);
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
+  const [userInputNotes, setUserInputNotes] = useState<Note[]>([]);
+  const [userMatchedIndices, setUserMatchedIndices] = useState<number[]>([]);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
@@ -73,6 +75,8 @@ const App: React.FC = () => {
     setFeedback(null);
     setDetectedNote(null);
     setLastPitch(null);
+    setUserInputNotes([]);
+    setUserMatchedIndices([]);
     if (!audioContextRef.current) {
       audioContextRef.current = new window.AudioContext();
     }
@@ -120,16 +124,30 @@ const App: React.FC = () => {
           setLastPitch(pitch);
           const detected = findClosestNote(pitch);
           setDetectedNote(detected);
-          if (detected === melodyRef.current[0]) {
-            setFeedback('Correct!');
-            setScore((s) => s + 10);
-            melodyRef.current = melodyRef.current.slice(1);
-            setMelody(melodyRef.current);
-            setExpectedNote(melodyRef.current[0] || null);
-            setTimeout(() => setFeedback(null), 700);
-          } else {
-            setFeedback(null);
-          }
+          setUserInputNotes(prev => {
+            if (prev[prev.length - 1] === detected) return prev;
+            const newInput = [...prev, detected];
+            const melodyToMatch = melodyRef.current;
+            const isCorrectSoFar = newInput.every((n, i) => n === melodyToMatch[i]);
+            if (!isCorrectSoFar) {
+              setFeedback('Try again!');
+              setTimeout(() => setFeedback(null), 700);
+              setUserMatchedIndices([]);
+              return [];
+            }
+            // Add marker for each correct note
+            if (newInput.length > prev.length) {
+              setUserMatchedIndices(indices => [...indices, newInput.length - 1]);
+            }
+            if (newInput.length === melodyToMatch.length) {
+              setFeedback('Success!');
+              setScore(s => s + 10 * melodyToMatch.length);
+              setTimeout(() => setFeedback(null), 1000);
+              setTimeout(() => stopListening(), 1200);
+              return [];
+            }
+            return newInput;
+          });
         } else {
           setDetectedNote(null);
           setLastPitch(null);
@@ -158,6 +176,8 @@ const App: React.FC = () => {
     setDetectedNote(null);
     setFeedback(null);
     setLastPitch(null);
+    setUserInputNotes([]);
+    setUserMatchedIndices([]);
     if (processorRef.current) {
       processorRef.current.disconnect();
       processorRef.current = null;
@@ -168,7 +188,7 @@ const App: React.FC = () => {
     }
   };
 
-  // Draw waveform and pitch marker
+  // Draw waveform and pitch marker, plus matched note markers
   function drawWaveform(buffer: Float32Array, pitch: number | null) {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -204,6 +224,22 @@ const App: React.FC = () => {
           ctx.fillText(`${detectedNote}`, x + 4, 32);
         }
       }
+    }
+    // Draw matched note markers
+    if (userMatchedIndices.length > 0 && melody.length > 0) {
+      userMatchedIndices.forEach((idx, i) => {
+        const x = ((idx + 0.5) / melody.length) * canvas.width;
+        ctx.beginPath();
+        ctx.arc(x, 12, 8, 0, 2 * Math.PI);
+        ctx.fillStyle = '#ff9800';
+        ctx.globalAlpha = 0.8;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px system-ui, Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${idx + 1}`, x, 16);
+      });
     }
   }
 
@@ -246,10 +282,11 @@ const App: React.FC = () => {
         <>
           <canvas ref={canvasRef} style={{ marginBottom: 16, background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px #0001' }} />
           <div style={{ marginBottom: 16 }}>
-            <div>Expected note: <b>{expectedNote || '-'}</b></div>
-            <div>Your note: <b>{detectedNote || '-'}</b></div>
+            <div>Expected melody: <b>{melody.join(' ')}</b></div>
+            <div>Your input: <b>{userInputNotes.join(' ') || '-'}</b></div>
+            <div>Current note: <b>{detectedNote || '-'}</b></div>
             {feedback && (
-              <div style={{ marginTop: 10, fontWeight: 'bold', color: feedback === 'Correct!' ? '#00c853' : '#d50000' }}>{feedback}</div>
+              <div style={{ marginTop: 10, fontWeight: 'bold', color: feedback === 'Success!' ? '#00c853' : '#d50000' }}>{feedback}</div>
             )}
           </div>
         </>
