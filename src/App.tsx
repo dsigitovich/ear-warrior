@@ -5,6 +5,14 @@ import * as Tone from 'tone';
 const NOTES = ['C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4'] as const;
 type Note = typeof NOTES[number];
 
+const DIFFICULTY_LEVELS = [
+  { label: 'Easy', value: 'easy', length: 3 },
+  { label: 'Medium', value: 'medium', length: 5 },
+  { label: 'Hard', value: 'hard', length: 7 },
+];
+
+type Difficulty = 'easy' | 'medium' | 'hard';
+
 function getRandomMelody(length: number = 5): Note[] {
   const melody: Note[] = [];
   for (let i = 0; i < length; i++) {
@@ -50,6 +58,7 @@ const App: React.FC = () => {
   const [detectedNote, setDetectedNote] = useState<Note | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [lastPitch, setLastPitch] = useState<number | null>(null);
+  const [difficulty, setDifficulty] = useState<Difficulty>('medium');
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
@@ -70,7 +79,8 @@ const App: React.FC = () => {
     if (audioContextRef.current.state !== 'running') {
       await audioContextRef.current.resume();
     }
-    const newMelody = getRandomMelody(5 + Math.floor(Math.random() * 3));
+    const melodyLength = DIFFICULTY_LEVELS.find((d) => d.value === difficulty)?.length || 5;
+    const newMelody = getRandomMelody(melodyLength);
     setMelody(newMelody);
     melodyRef.current = [...newMelody];
     setExpectedNote(newMelody[0]);
@@ -209,6 +219,19 @@ const App: React.FC = () => {
     <div className="app-container">
       <h1>Melody Ear Trainer</h1>
       <div style={{ marginBottom: 16 }}>
+        <label style={{ marginRight: 8 }}>
+          Difficulty:
+          <select
+            value={difficulty}
+            onChange={e => setDifficulty(e.target.value as Difficulty)}
+            disabled={isPlaying || isListening}
+            style={{ marginLeft: 8 }}
+          >
+            {DIFFICULTY_LEVELS.map(level => (
+              <option key={level.value} value={level.value}>{level.label}</option>
+            ))}
+          </select>
+        </label>
         <button onClick={playMelody} disabled={isPlaying || isListening}>
           {isPlaying ? 'Playing...' : 'Play Melody'}
         </button>
