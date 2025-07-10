@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './App.css';
 import * as Tone from 'tone';
 
@@ -13,21 +13,29 @@ function getRandomMelody(length: number = 5): Note[] {
   return melody;
 }
 
-// Simple autocorrelation pitch detection
+// Improved autocorrelation pitch detection
 function detectPitch(buffer: Float32Array, sampleRate: number): number | null {
+  const windowed = buffer.map((v, i) => v * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (buffer.length - 1))));
   let maxCorr = 0;
   let bestLag = 0;
+  let rms = 0;
+  for (let i = 0; i < windowed.length; i++) rms += windowed[i] * windowed[i];
+  rms = Math.sqrt(rms / windowed.length);
+  if (rms < 0.01) return null; // Too quiet
   for (let lag = 80; lag < 1000; lag++) { // ~80Hz to 1000Hz
     let corr = 0;
-    for (let i = 0; i < buffer.length - lag; i++) {
-      corr += buffer[i] * buffer[i + lag];
+    let norm = 0;
+    for (let i = 0; i < windowed.length - lag; i++) {
+      corr += windowed[i] * windowed[i + lag];
+      norm += windowed[i] * windowed[i] + windowed[i + lag] * windowed[i + lag];
     }
+    if (norm > 0) corr /= Math.sqrt(norm);
     if (corr > maxCorr) {
       maxCorr = corr;
       bestLag = lag;
     }
   }
-  if (maxCorr > 10) { // Empirical threshold
+  if (maxCorr > 0.7 && bestLag > 80 && bestLag < 1000 - 1) {
     return sampleRate / bestLag;
   }
   return null;
@@ -41,11 +49,13 @@ const App: React.FC = () => {
   const [expectedNote, setExpectedNote] = useState<Note | null>(null);
   const [detectedNote, setDetectedNote] = useState<Note | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [lastPitch, setLastPitch] = useState<number | null>(null);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const melodyRef = useRef<Note[]>([]);
   const isListeningRef = useRef(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const playMelody = async () => {
     setIsPlaying(true);
@@ -53,6 +63,7 @@ const App: React.FC = () => {
     isListeningRef.current = false;
     setFeedback(null);
     setDetectedNote(null);
+    setLastPitch(null);
     if (!audioContextRef.current) {
       audioContextRef.current = new window.AudioContext();
     }
@@ -96,6 +107,7 @@ const App: React.FC = () => {
         const input = event.inputBuffer.getChannelData(0);
         const pitch = detectPitch(input, audioContextRef.current!.sampleRate);
         if (pitch) {
+          setLastPitch(pitch);
           const detected = findClosestNote(pitch);
           setDetectedNote(detected);
           if (detected === melodyRef.current[0]) {
@@ -110,7 +122,9 @@ const App: React.FC = () => {
           }
         } else {
           setDetectedNote(null);
+          setLastPitch(null);
         }
+        drawWaveform(input, pitch);
       };
       processorRef.current = processor;
     } catch (err) {
@@ -133,11 +147,63 @@ const App: React.FC = () => {
     setExpectedNote(null);
     setDetectedNote(null);
     setFeedback(null);
+    setLastPitch(null);
     if (processorRef.current) {
       processorRef.current.disconnect();
       processorRef.current = null;
     }
+    if (canvasRef.current) {
+      const ctx = canvasRef.current.getContext('2d');
+      if (ctx) ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    }
   };
+
+  // Draw waveform and pitch marker
+  function drawWaveform(buffer: Float32Array, pitch: number | null) {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Draw waveform
+    ctx.beginPath();
+    ctx.moveTo(0, canvas.height / 2);
+    for (let i = 0; i < buffer.length; i++) {
+      const x = (i / buffer.length) * canvas.width;
+      const y = (1 - buffer[i]) * (canvas.height / 2);
+      ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = '#1976d2';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    // Draw pitch marker
+    if (pitch) {
+      const period = audioContextRef.current ? audioContextRef.current.sampleRate / pitch : 0;
+      if (period > 0 && period < buffer.length) {
+        const x = (period / buffer.length) * canvas.width;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.strokeStyle = '#00c853';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.fillStyle = '#00c853';
+        ctx.font = '12px system-ui, Arial';
+        ctx.fillText(`${pitch.toFixed(1)} Hz`, x + 4, 16);
+        if (detectedNote) {
+          ctx.fillText(`${detectedNote}`, x + 4, 32);
+        }
+      }
+    }
+  }
+
+  // Resize canvas on mount
+  useEffect(() => {
+    if (canvasRef.current) {
+      canvasRef.current.width = 400;
+      canvasRef.current.height = 100;
+    }
+  }, []);
 
   return (
     <div className="app-container">
@@ -154,13 +220,16 @@ const App: React.FC = () => {
       </div>
       <div style={{ marginBottom: 16 }}>Score: <b>{score}</b></div>
       {isListening && (
-        <div style={{ marginBottom: 16 }}>
-          <div>Expected note: <b>{expectedNote || '-'}</b></div>
-          <div>Your note: <b>{detectedNote || '-'}</b></div>
-          {feedback && (
-            <div style={{ marginTop: 10, fontWeight: 'bold', color: feedback === 'Correct!' ? '#00c853' : '#d50000' }}>{feedback}</div>
-          )}
-        </div>
+        <>
+          <canvas ref={canvasRef} style={{ marginBottom: 16, background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px #0001' }} />
+          <div style={{ marginBottom: 16 }}>
+            <div>Expected note: <b>{expectedNote || '-'}</b></div>
+            <div>Your note: <b>{detectedNote || '-'}</b></div>
+            {feedback && (
+              <div style={{ marginTop: 10, fontWeight: 'bold', color: feedback === 'Correct!' ? '#00c853' : '#d50000' }}>{feedback}</div>
+            )}
+          </div>
+        </>
       )}
       <p style={{ color: '#888' }}>Listen to the melody, then sing or play it back!</p>
     </div>
