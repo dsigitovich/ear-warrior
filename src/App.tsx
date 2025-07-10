@@ -64,6 +64,7 @@ function detectPitch(buffer: Float32Array, sampleRate: number): number | null {
 
 const App: React.FC = () => {
   const [score, setScore] = useState(0);
+  const [streak, setStreak] = useState(0);
   const [melody, setMelody] = useState<Note[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -285,7 +286,11 @@ const App: React.FC = () => {
 
   return (
     <div className="app-container">
-      <h1>Melody Ear Trainer</h1>
+      <h1>Ear Warrior</h1>
+      <div className="score-panel">
+        <span>Score: {score} ⭐</span>
+        <span>Streak: {streak} 🔥</span>
+      </div>
       <div style={{ marginBottom: 16 }}>
         <label style={{ marginRight: 8 }}>
           Difficulty:
@@ -314,21 +319,33 @@ const App: React.FC = () => {
           </>
         )}
       </div>
-      <div style={{ marginBottom: 16 }}>Score: <b>{score}</b></div>
-      {isListening && (
-        <>
-          <canvas ref={canvasRef} style={{ marginBottom: 16, background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px #0001' }} />
-          <div style={{ marginBottom: 16 }}>
-            <div>Expected melody: <b>{melody.join(' ')}</b></div>
-            <div>Your input: <b>{userInputNotes.join(' ') || '-'}</b></div>
-            <div>Current note: <b>{detectedNote || '-'}</b></div>
-            {feedback && (
-              <div style={{ marginTop: 10, fontWeight: 'bold', color: feedback === 'Success!' ? '#00c853' : '#d50000' }}>{feedback}</div>
-            )}
+      <canvas ref={canvasRef} className="waveform-canvas" width={500} height={80} />
+      <div className="note-panel">
+        {melody.map((note, idx) => (
+          <div
+            key={idx}
+            className={
+              'note' +
+              (userMatchedIndices.includes(idx)
+                ? ' current'
+                : '')
+            }
+          >
+            {note}
           </div>
-        </>
-      )}
-      <p style={{ color: '#888' }}>Listen to the melody, then sing or play it back!</p>
+        ))}
+      </div>
+      <div className="note-panel">
+        {userInputNotes.map((note, idx) => (
+          <div key={idx} className="note" style={{ background: '#ffe066', color: '#3a1c71' }}>
+            {note}
+          </div>
+        ))}
+      </div>
+      {feedback && <div className="feedback">{feedback} {feedback === 'Correct!' ? '🎉' : feedback === 'Wrong sequence!' ? '❌' : ''}</div>}
+      <div style={{ marginTop: 24, fontSize: '0.9rem', color: '#ffe066', opacity: 0.7 }}>
+        <span>Sing or play the melody you hear!<br/>Get the sequence right to earn points.</span>
+      </div>
     </div>
   );
 };
