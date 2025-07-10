@@ -155,31 +155,26 @@ function App() {
     };
 
     return (
-        <div style={{ background: 'black', color: 'white', textAlign: 'center', padding: '20px', minHeight: '100vh' }}>
+        <div className="app-container">
             <h1>Repeat the Melody</h1>
-            <button
-                onClick={playMelody}
-                disabled={state.isPlaying}
-                style={{
-                    padding: '10px 20px',
-                    fontSize: '16px',
-                    cursor: state.isPlaying ? 'not-allowed' : 'pointer',
-                    background: state.isPlaying ? '#555' : '#fff',
-                    color: state.isPlaying ? '#aaa' : '#000',
-                }}
-            >
-                {state.isPlaying ? 'Playing...' : 'Play Melody'}
-            </button>
-            {state.isRecording && (
+            <div className="game-panel">
+                <div className="score-bar">Score: {state.score}</div>
                 <button
-                    onClick={stopRecording}
-                    style={{ padding: '10px 20px', fontSize: '16px', marginLeft: '10px' }}
+                    onClick={playMelody}
+                    disabled={state.isPlaying}
                 >
-                    Stop Recording
+                    {state.isPlaying ? 'Playing...' : 'Play Melody'}
                 </button>
-            )}
-            <p style={{ marginTop: '20px' }}>Score: {state.score}</p>
-            <p>Listen and repeat!</p>
+                {state.isRecording && (
+                    <button
+                        onClick={stopRecording}
+                        style={{ marginLeft: '10px' }}
+                    >
+                        Stop Recording
+                    </button>
+                )}
+                <p style={{ marginTop: '20px' }}>Listen and repeat!</p>
+            </div>
         </div>
     );
 }
