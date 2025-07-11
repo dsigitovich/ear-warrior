@@ -7,9 +7,11 @@ import { detectPitchFromBuffer } from '../../../features/pitch-detection/model/p
 import { checkMelodyMatch } from '../../../features/game-logic/model/game-logic';
 import { createMelody } from '../../../entities/melody/model/melody';
 import { GameEntity, createGame, updateGameStats, setGameState, setCurrentMelody, addUserInput, setMatchedIndices, setFeedback, setDetectedPitch, setDetectedNote, resetGameInput } from '../../../entities/game/model/game';
+import { useDifficultyStore } from '../../../shared/store/difficulty-store';
 
 export function useGameSession() {
-  const [game, setGame] = useState<GameEntity>(() => createGame('easy'));
+  const difficulty = useDifficultyStore(s => s.difficulty)
+  const [game, setGame] = useState<GameEntity>(() => createGame(difficulty));
   const [audioBuffer, setAudioBuffer] = useState<Float32Array>(new Float32Array());
   
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -85,7 +87,7 @@ export function useGameSession() {
         setGame(prev => setDetectedNote(prev, pitchResult.note));
         if (pitchResult.note) {
           setGame(prev => {
-            let newGame = addUserInput(prev, pitchResult.note!);
+            const newGame = addUserInput(prev, pitchResult.note!);
             let attempts = prev.attemptsLeft;
             const result = checkMelodyMatch(
               newGame.userInput,
@@ -124,7 +126,7 @@ export function useGameSession() {
       };
       
       processorRef.current = processor;
-    } catch (err) {
+    } catch {
       setGame(prev => setFeedback(prev, 'Microphone error'));
     }
   }, [game.currentMelody]);
