@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Note, Difficulty } from '../../../shared/types';
 import { DIFFICULTY_LEVELS } from '../../../shared/config/constants';
 import { Button } from '../../../shared/ui/Button';
@@ -45,6 +45,22 @@ export const GamePanel: React.FC<GamePanelProps> = ({
   onStopListening,
   onReplayMelody,
 }) => {
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
+  useEffect(() => {
+    if (feedback) {
+      setShowFeedback(true);
+      setFadeOut(false);
+    } else if (showFeedback) {
+      setFadeOut(true);
+      const timeout = setTimeout(() => {
+        setShowFeedback(false);
+        setFadeOut(false);
+      }, 500); // match CSS transition
+      return () => clearTimeout(timeout);
+    }
+  }, [feedback]);
+
   return (
     <div className="game-panel">
       <h1 className="game-panel__title">Ear Warrior</h1>
@@ -128,8 +144,8 @@ export const GamePanel: React.FC<GamePanelProps> = ({
         </div>
       </div>
       
-      {feedback && (
-        <div className="game-panel__feedback">
+      {showFeedback && (
+        <div className={`game-panel__feedback${fadeOut ? ' game-panel__feedback--hidden' : ''}`}>
           {feedback}
           {feedback === 'Success!' ? ' 🎉' : feedback === 'Try again!' ? ' ❌' : ''}
         </div>

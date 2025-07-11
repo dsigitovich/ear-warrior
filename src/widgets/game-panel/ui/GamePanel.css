@@ -112,6 +112,14 @@
   border-radius: 0;
   border: 2px solid #ff6b6b;
   animation: arcade-pulse 0.5s ease-in-out;
+  opacity: 1;
+  transition: opacity 0.5s;
+  pointer-events: auto;
+}
+
+.game-panel__feedback--hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 @keyframes arcade-pulse {
