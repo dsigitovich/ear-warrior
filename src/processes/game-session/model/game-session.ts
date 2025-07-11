@@ -21,7 +21,7 @@ export function useGameSession() {
   gameMelodyRef.current = game.currentMelody;
 
   const playMelody = useCallback(async () => {
-    setGame(prev => setGameState(prev, 'playing'));
+    setGame(prev => ({ ...setGameState(prev, 'playing'), attemptsLeft: 3 }));
     setGame(prev => resetGameInput(prev));
 
     // Отключаем микрофон перед проигрыванием мелодии
@@ -74,22 +74,22 @@ export function useGameSession() {
       processor.connect(audioContextRef.current.destination);
       
       processor.onaudioprocess = (event) => {
-        console.log('onaudioprocess handler called');
-        if (!isListeningRef.current || !gameMelodyRef.current) {
-          console.log('onaudioprocess early return', { isListening: isListeningRef.current, hasMelody: !!gameMelodyRef.current });
-          return;
-        }
-        const input = event.inputBuffer.getChannelData(0);
-        console.log('onaudioprocess called, input.length:', input.length, 'input:', input.slice(0, 10));
-        setAudioBuffer(new Float32Array(input));
-        
-        const pitchResult = detectPitchFromBuffer(input, audioContextRef.current!.sampleRate);
-        setGame(prev => setDetectedPitch(prev, pitchResult.frequency));
-        setGame(prev => setDetectedNote(prev, pitchResult.note));
-        
-        if (pitchResult.note) {
-          setGame(prev => {
-            const newGame = addUserInput(prev, pitchResult.note!);
+        setGame(prev => {
+          if (!isListeningRef.current || !gameMelodyRef.current || prev.attemptsLeft === 0) {
+            return prev;
+          }
+          console.log('onaudioprocess handler called');
+          const input = event.inputBuffer.getChannelData(0);
+          console.log('onaudioprocess called, input.length:', input.length, 'input:', input.slice(0, 10));
+          setAudioBuffer(new Float32Array(input));
+          
+          const pitchResult = detectPitchFromBuffer(input, audioContextRef.current!.sampleRate);
+          setGame(prev => setDetectedPitch(prev, pitchResult.frequency));
+          setGame(prev => setDetectedNote(prev, pitchResult.note));
+          
+          if (pitchResult.note) {
+            let newGame = addUserInput(prev, pitchResult.note!);
+            let attempts = prev.attemptsLeft;
             const result = checkMelodyMatch(
               newGame.userInput,
               gameMelodyRef.current!,
@@ -98,27 +98,35 @@ export function useGameSession() {
             );
             
             if (!result.isCorrect) {
-              setGame(prev => setFeedback(prev, 'Try again!'));
-              setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
-              return resetGameInput(newGame);
+              attempts = prev.attemptsLeft - 1;
+              if (attempts <= 0) {
+                setFeedback(newGame, 'No attempts left!');
+                setTimeout(() => setGame(p => setFeedback(p, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
+                setTimeout(() => stopListening(), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
+                return { ...resetGameInput(newGame), attemptsLeft: 0 };
+              } else {
+                setFeedback(newGame, 'Try again!');
+                setTimeout(() => setGame(p => setFeedback(p, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
+                return { ...newGame, attemptsLeft: attempts };
+              }
             }
-            
             const updatedGame = setMatchedIndices(newGame, result.matchedIndices);
             
             if (!result.shouldContinue) {
-              setGame(prev => setFeedback(prev, 'Success!'));
-              setGame(prev => updateGameStats(prev, result.score, result.streak));
-              setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.FEEDBACK_DURATION);
+              setFeedback(updatedGame, 'Success!');
+              setGame(p => updateGameStats(p, result.score, result.streak));
+              setTimeout(() => setGame(p => setFeedback(p, null)), GAME_CONFIG.FEEDBACK_DURATION);
               setTimeout(() => stopListening(), GAME_CONFIG.SUCCESS_DELAY);
-              return updatedGame;
+              return { ...resetGameInput(updatedGame), attemptsLeft: 3 };
             }
             
-            return updatedGame;
-          });
-        } else {
-          setGame(prev => setDetectedNote(prev, null));
-          setGame(prev => setDetectedPitch(prev, null));
-        }
+            return { ...updatedGame, attemptsLeft: attempts };
+          } else {
+            setGame(prev => setDetectedNote(prev, null));
+            setGame(prev => setDetectedPitch(prev, null));
+          }
+          return prev;
+        });
       };
       
       processorRef.current = processor;
