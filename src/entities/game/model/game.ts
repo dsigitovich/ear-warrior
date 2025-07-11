@@ -11,6 +11,7 @@ export interface GameEntity {
   feedback: string | null;
   detectedPitch: number | null;
   detectedNote: string | null;
+  attemptsLeft: number;
 }
 
 export function createGame(difficulty: Difficulty = 'easy'): GameEntity {
@@ -27,6 +28,7 @@ export function createGame(difficulty: Difficulty = 'easy'): GameEntity {
     feedback: null,
     detectedPitch: null,
     detectedNote: null,
+    attemptsLeft: 3,
   };
 }
 
@@ -97,5 +99,6 @@ export function resetGameInput(game: GameEntity): GameEntity {
     feedback: null,
     detectedPitch: null,
     detectedNote: null,
+    attemptsLeft: 3,
   };
 } 
