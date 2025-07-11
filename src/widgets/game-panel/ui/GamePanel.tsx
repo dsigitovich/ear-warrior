@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Note, Difficulty } from '../../../shared/types';
-import { DIFFICULTY_LEVELS } from '../../../shared/config/constants';
+import { Note } from '../../../shared/types';
 import { Button } from '../../../shared/ui/Button';
 import { ScorePanel } from '../../score-panel';
 import { WaveformDisplay } from '../../waveform-display';
@@ -13,7 +12,6 @@ interface GamePanelProps {
   melody: Note[];
   userInputNotes: Note[];
   matchedIndices: number[];
-  difficulty: Difficulty;
   isPlaying: boolean;
   isListening: boolean;
   feedback: string | null;
@@ -21,7 +19,6 @@ interface GamePanelProps {
   detectedNote: string | null;
   audioBuffer: Float32Array;
   sampleRate: number;
-  onDifficultyChange: (difficulty: Difficulty) => void;
   onPlayMelody: () => void;
   onStopListening: () => void;
   onReplayMelody: () => void;
@@ -34,7 +31,6 @@ export const GamePanel: React.FC<GamePanelProps> = ({
   melody,
   userInputNotes,
   matchedIndices,
-  difficulty,
   isPlaying,
   isListening,
   feedback,
@@ -42,7 +38,6 @@ export const GamePanel: React.FC<GamePanelProps> = ({
   detectedNote,
   audioBuffer,
   sampleRate,
-  onDifficultyChange,
   onPlayMelody,
   onStopListening,
   onReplayMelody,
@@ -70,21 +65,7 @@ export const GamePanel: React.FC<GamePanelProps> = ({
       <ScorePanel stats={{ score, streak }} attemptsLeft={attemptsLeft} />
       
       <div className="game-panel__controls">
-        <label className="game-panel__difficulty-label">
-          Difficulty:
-          <select
-            value={difficulty}
-            onChange={(e) => onDifficultyChange(e.target.value as Difficulty)}
-            disabled={isPlaying || isListening}
-            className="game-panel__difficulty-select"
-          >
-            {DIFFICULTY_LEVELS.map(level => (
-              <option key={level.value} value={level.value}>
-                {level.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        {/* Difficulty selection removed */}
         
         <Button
           onClick={onPlayMelody}
