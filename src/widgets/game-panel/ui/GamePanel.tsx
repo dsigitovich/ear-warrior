@@ -9,6 +9,7 @@ import './GamePanel.css';
 interface GamePanelProps {
   score: number;
   streak: number;
+  attemptsLeft: number;
   melody: Note[];
   userInputNotes: Note[];
   matchedIndices: number[];
@@ -29,6 +30,7 @@ interface GamePanelProps {
 export const GamePanel: React.FC<GamePanelProps> = ({
   score,
   streak,
+  attemptsLeft,
   melody,
   userInputNotes,
   matchedIndices,
@@ -65,7 +67,7 @@ export const GamePanel: React.FC<GamePanelProps> = ({
     <div className="game-panel">
       <h1 className="game-panel__title">Ear Warrior</h1>
       
-      <ScorePanel stats={{ score, streak }} />
+      <ScorePanel stats={{ score, streak }} attemptsLeft={attemptsLeft} />
       
       <div className="game-panel__controls">
         <label className="game-panel__difficulty-label">

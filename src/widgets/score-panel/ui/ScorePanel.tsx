@@ -4,9 +4,10 @@ import './ScorePanel.css';
 
 interface ScorePanelProps {
   stats: GameStats;
+  attemptsLeft: number;
 }
 
-export const ScorePanel: React.FC<ScorePanelProps> = ({ stats }) => {
+export const ScorePanel: React.FC<ScorePanelProps> = ({ stats, attemptsLeft }) => {
   return (
     <div className="score-panel">
       <span className="score-panel__item">
@@ -14,6 +15,14 @@ export const ScorePanel: React.FC<ScorePanelProps> = ({ stats }) => {
       </span>
       <span className="score-panel__item">
         Streak: {stats.streak} 🔥
+      </span>
+      <span className="score-panel__item score-panel__item--attempts">
+        Attempts:
+        <span className="score-panel__hearts">
+          {Array.from({ length: attemptsLeft }).map((_, i) => (
+            <span key={i} role="img" aria-label="heart">❤️</span>
+          ))}
+        </span>
       </span>
     </div>
   );

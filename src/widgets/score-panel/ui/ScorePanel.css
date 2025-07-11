@@ -3,11 +3,12 @@
   gap: 12px;
   justify-content: center;
   margin-bottom: 12px;
-  padding: 8px 0;
+  padding: 8px 16px 8px 16px;
   background: #3a1c71;
   border-radius: 0;
-  /* border: 3px solid #ffe066; */
-  /* box-shadow: 0 4px #3a1c71; */
+  flex-wrap: wrap;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .score-panel__item {
@@ -25,4 +26,24 @@
   justify-content: center;
   border: none;
   box-shadow: none;
+  min-width: 90px;
+  box-sizing: border-box;
+}
+
+.score-panel__item--attempts {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 1;
+  min-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.score-panel__hearts {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-wrap: nowrap;
+  overflow: hidden;
 } 
