@@ -11,9 +11,7 @@ export const GamePage: React.FC = () => {
     playMelody,
     stopListening,
     replayMelody,
-    changeDifficulty,
   } = useGameSession();
-
   const melodyNotes = game.currentMelody ? getMelodyNotes(game.currentMelody) : [];
 
   return (
@@ -23,9 +21,8 @@ export const GamePage: React.FC = () => {
         streak={game.stats.streak}
         attemptsLeft={game.attemptsLeft}
         melody={melodyNotes}
-        userInputNotes={game.userInput as any[]}
+        userInputNotes={game.userInput as import('../../../shared/types').Note[]}
         matchedIndices={game.matchedIndices}
-        difficulty={game.difficulty}
         isPlaying={game.state === 'playing'}
         isListening={game.state === 'listening'}
         feedback={game.feedback}
@@ -33,7 +30,6 @@ export const GamePage: React.FC = () => {
         detectedNote={game.detectedNote}
         audioBuffer={audioBuffer}
         sampleRate={44100}
-        onDifficultyChange={changeDifficulty}
         onPlayMelody={playMelody}
         onStopListening={stopListening}
         onReplayMelody={replayMelody}
