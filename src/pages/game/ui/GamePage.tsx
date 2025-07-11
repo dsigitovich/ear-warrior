@@ -1,10 +1,9 @@
-import React from 'react';
 import { GamePanel } from '../../../widgets/game-panel';
 import { useGameSession } from '../../../processes/game-session';
 import { getMelodyNotes } from '../../../entities/melody/model/melody';
 import './GamePage.css';
 
-export const GamePage: React.FC = () => {
+export function GamePage () {
   const {
     game,
     audioBuffer,
@@ -36,4 +35,4 @@ export const GamePage: React.FC = () => {
       />
     </div>
   );
-}; 
+} 
