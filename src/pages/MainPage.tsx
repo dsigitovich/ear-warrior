@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DIFFICULTY_LEVELS } from '../shared/config/constants'
 import { useDifficultyStore } from '../shared/store/difficulty-store'
@@ -19,7 +19,7 @@ export function MainPage () {
       <select
         id='difficulty'
         value={selected}
-        onChange={e => setSelected(e.target.value as any)}
+        onChange={e => setSelected(e.target.value as import('../shared/types').Difficulty)}
         style={{ fontSize: 16 }}
       >
         {DIFFICULTY_LEVELS.map(level => (
