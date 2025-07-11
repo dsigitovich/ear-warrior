@@ -91,9 +91,6 @@ export const WaveformDisplay: React.FC<WaveformDisplayProps> = ({
 
   return (
     <div style={{ width: 500, margin: '0 auto', textAlign: 'center' }}>
-      <div style={{ color: '#ffe066', fontSize: 12, marginBottom: 2 }}>
-        buffer.length: {buffer.length}
-      </div>
       <canvas
         ref={canvasRef}
         className="waveform-display"
