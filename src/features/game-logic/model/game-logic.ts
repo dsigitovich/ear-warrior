@@ -30,11 +30,20 @@ export function checkMelodyMatch(
   
   const matchedIndices = userInput.map((_, index) => index);
   const isComplete = userInput.length === melodyNotes.length;
-  
+
+  // Only increment score for the last note entered
+  let newScore = currentScore;
+  if (!isComplete && userInput.length > 0) {
+    newScore = currentScore + GAME_CONFIG.SUCCESS_SCORE_MULTIPLIER;
+  }
+
   if (isComplete) {
-    const newScore = currentScore + GAME_CONFIG.SUCCESS_SCORE_MULTIPLIER * melodyNotes.length;
+    // If the melody is complete, increment score only if it wasn't already incremented for this note
+    if (melodyNotes.length === 1) {
+      // For single-note melodies, increment once
+      newScore = currentScore + GAME_CONFIG.SUCCESS_SCORE_MULTIPLIER;
+    }
     const newStreak = currentStreak + 1;
-    
     return {
       isCorrect: true,
       matchedIndices,
@@ -48,7 +57,7 @@ export function checkMelodyMatch(
     isCorrect: true,
     matchedIndices,
     shouldContinue: true,
-    score: currentScore,
+    score: newScore,
     streak: currentStreak,
   };
 }
