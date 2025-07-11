@@ -2,6 +2,7 @@ import { GamePanel } from '../../../widgets/game-panel';
 import { useGameSession } from '../../../processes/game-session';
 import { getMelodyNotes } from '../../../entities/melody/model/melody';
 import './GamePage.css';
+import { useNavigate } from 'react-router-dom';
 
 export function GamePage () {
   const {
@@ -12,9 +13,16 @@ export function GamePage () {
     replayMelody,
   } = useGameSession();
   const melodyNotes = game.currentMelody ? getMelodyNotes(game.currentMelody) : [];
+  const navigate = useNavigate();
 
   return (
     <div className="game-page">
+      <button
+        style={{ position: 'absolute', top: 20, left: 20, zIndex: 10 }}
+        onClick={() => navigate('/')}
+      >
+        Back
+      </button>
       <GamePanel
         score={game.stats.score}
         streak={game.stats.streak}

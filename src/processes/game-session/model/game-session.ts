@@ -18,6 +18,7 @@ export function useGameSession() {
   const processorRef = useRef<ScriptProcessorNode | null>(null);
   const isListeningRef = useRef(false);
   const gameMelodyRef = useRef<GameEntity['currentMelody']>(null);
+  const isProcessingRef = useRef(false);
 
   // Update ref on every render
   gameMelodyRef.current = game.currentMelody;
@@ -76,10 +77,10 @@ export function useGameSession() {
       processor.connect(audioContextRef.current.destination);
       
       processor.onaudioprocess = (event) => {
-        if (!isListeningRef.current || !gameMelodyRef.current) {
-          console.log('onaudioprocess early return', { isListening: isListeningRef.current, hasMelody: !!gameMelodyRef.current });
+        if (!isListeningRef.current || !gameMelodyRef.current || isProcessingRef.current) {
           return;
         }
+        isProcessingRef.current = true;
         const input = event.inputBuffer.getChannelData(0);
         setAudioBuffer(new Float32Array(input));
         const pitchResult = detectPitchFromBuffer(input, audioContextRef.current!.sampleRate);
@@ -101,11 +102,13 @@ export function useGameSession() {
                 setGame(prev => setFeedback(prev, 'No attempts left!'));
                 setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
                 setTimeout(() => stopListening(), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
+                setTimeout(() => { isProcessingRef.current = false }, 700);
                 return { ...resetGameInput(newGame), attemptsLeft: 0 };
               } else {
                 setGame(prev => setFeedback(prev, 'Try again!'));
                 setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
                 setTimeout(() => replayMelody(), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
+                setTimeout(() => { isProcessingRef.current = false }, 700);
                 return { ...newGame, attemptsLeft: attempts };
               }
             }
@@ -115,13 +118,16 @@ export function useGameSession() {
               setGame(prev => updateGameStats(prev, result.score, result.streak));
               setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.FEEDBACK_DURATION);
               setTimeout(() => stopListening(), GAME_CONFIG.SUCCESS_DELAY);
+              setTimeout(() => { isProcessingRef.current = false }, 700);
               return { ...updatedGame, attemptsLeft: 3 };
             }
+            setTimeout(() => { isProcessingRef.current = false }, 700);
             return { ...updatedGame, attemptsLeft: attempts };
           });
         } else {
           setGame(prev => setDetectedNote(prev, null));
           setGame(prev => setDetectedPitch(prev, null));
+          setTimeout(() => { isProcessingRef.current = false }, 700);
         }
       };
       
