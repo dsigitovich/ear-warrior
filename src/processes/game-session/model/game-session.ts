@@ -89,7 +89,8 @@ export function useGameSession() {
         
         if (pitchResult.note) {
           setGame(prev => {
-            const newGame = addUserInput(prev, pitchResult.note!);
+            let newGame = addUserInput(prev, pitchResult.note!);
+            let attempts = prev.attemptsLeft;
             const result = checkMelodyMatch(
               newGame.userInput,
               gameMelodyRef.current!,
@@ -98,9 +99,18 @@ export function useGameSession() {
             );
             
             if (!result.isCorrect) {
-              setGame(prev => setFeedback(prev, 'Try again!'));
-              setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
-              return resetGameInput(newGame);
+              attempts = prev.attemptsLeft - 1;
+              if (attempts <= 0) {
+                setGame(prev => setFeedback(prev, 'No attempts left!'));
+                setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
+                setTimeout(() => stopListening(), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
+                return { ...resetGameInput(newGame), attemptsLeft: 0 };
+              } else {
+                setGame(prev => setFeedback(prev, 'Try again!'));
+                setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION);
+                // Do NOT reset userInput, just decrement attemptsLeft
+                return { ...newGame, attemptsLeft: attempts };
+              }
             }
             
             const updatedGame = setMatchedIndices(newGame, result.matchedIndices);
@@ -110,10 +120,10 @@ export function useGameSession() {
               setGame(prev => updateGameStats(prev, result.score, result.streak));
               setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.FEEDBACK_DURATION);
               setTimeout(() => stopListening(), GAME_CONFIG.SUCCESS_DELAY);
-              return updatedGame;
+              return { ...updatedGame, attemptsLeft: 3 };
             }
             
-            return updatedGame;
+            return { ...updatedGame, attemptsLeft: attempts };
           });
         } else {
           setGame(prev => setDetectedNote(prev, null));
