@@ -23,6 +23,9 @@ export function useGameSession() {
   const playMelody = useCallback(async () => {
     setGame(prev => setGameState(prev, 'playing'));
     setGame(prev => resetGameInput(prev));
+
+    // Отключаем микрофон перед проигрыванием мелодии
+    stopListening();
     
     if (!audioContextRef.current) {
       audioContextRef.current = new window.AudioContext();
