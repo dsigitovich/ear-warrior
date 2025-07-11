@@ -10,6 +10,65 @@ const NOTES = [
 ] as const;
 type Note = typeof NOTES[number];
 
+// Musical intervals within one octave
+const INTERVALS = [
+  { name: 'Unison', semitones: 0 },
+  { name: 'Minor Second', semitones: 1 },
+  { name: 'Major Second', semitones: 2 },
+  { name: 'Minor Third', semitones: 3 },
+  { name: 'Major Third', semitones: 4 },
+  { name: 'Perfect Fourth', semitones: 5 },
+  { name: 'Perfect Fifth', semitones: 7 },
+  { name: 'Minor Sixth', semitones: 8 },
+  { name: 'Major Sixth', semitones: 9 },
+  { name: 'Minor Seventh', semitones: 10 },
+  { name: 'Major Seventh', semitones: 11 },
+  { name: 'Octave', semitones: 12 }
+];
+
+// Helper function to get note index from note name
+function getNoteIndex(note: Note): number {
+  return NOTES.indexOf(note);
+}
+
+// Helper function to get note name from index
+function getNoteFromIndex(index: number): Note {
+  return NOTES[index];
+}
+
+// Generate melody using musical intervals
+function generateMelodyWithIntervals(difficulty: 'elementary' | 'easy' | 'medium' | 'hard'): Note[] {
+  const level = DIFFICULTY_LEVELS.find(l => l.value === difficulty) || DIFFICULTY_LEVELS[1];
+  const notesCount = level.notes;
+  
+  const melody: Note[] = [];
+  let currentNoteIndex = Math.floor(Math.random() * NOTES.length);
+  
+  for (let i = 0; i < notesCount; i++) {
+    melody.push(getNoteFromIndex(currentNoteIndex));
+    
+    if (i < notesCount - 1) {
+      // Choose a random interval for the next note
+      const interval = INTERVALS[Math.floor(Math.random() * INTERVALS.length)];
+      
+      // Calculate next note index with interval
+      let nextNoteIndex = currentNoteIndex + interval.semitones;
+      
+      // Keep within the NOTES array bounds
+      if (nextNoteIndex >= NOTES.length) {
+        nextNoteIndex = currentNoteIndex - interval.semitones;
+      }
+      if (nextNoteIndex < 0) {
+        nextNoteIndex = currentNoteIndex + interval.semitones;
+      }
+      
+      currentNoteIndex = nextNoteIndex;
+    }
+  }
+  
+  return melody;
+}
+
 // Difficulty levels
 const DIFFICULTY_LEVELS = [
   { label: 'Elementary', value: 'elementary', notes: 1 },
@@ -17,17 +76,6 @@ const DIFFICULTY_LEVELS = [
   { label: 'Medium', value: 'medium', notes: 5 },
   { label: 'Hard', value: 'hard', notes: 8 },
 ];
-
-// Generate a random melody based on difficulty
-const generateMelody = (difficulty: 'elementary' | 'easy' | 'medium' | 'hard'): Note[] => {
-  const level = DIFFICULTY_LEVELS.find(l => l.value === difficulty) || DIFFICULTY_LEVELS[1];
-  const notesCount = level.notes;
-  const melody: Note[] = [];
-  for (let i = 0; i < notesCount; i++) {
-    melody.push(NOTES[Math.floor(Math.random() * NOTES.length)]);
-  }
-  return melody;
-};
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 
@@ -103,8 +151,8 @@ const App: React.FC = () => {
     if (audioContextRef.current.state !== 'running') {
       await audioContextRef.current.resume();
     }
-    // When generating melody, use the selected difficulty
-    const newMelody = generateMelody(difficulty);
+    // Generate melody using musical intervals
+    const newMelody = generateMelodyWithIntervals(difficulty);
     setMelody(newMelody);
     melodyRef.current = [...newMelody];
     setExpectedNote(newMelody[0]);
