@@ -1,0 +1,10 @@
+.waveform-display {
+  border: 2px solid #ffe066;
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.3);
+  margin: 10px 0 0 0;
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 2px #3a1c71;
+} 

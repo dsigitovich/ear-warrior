@@ -1,0 +1,131 @@
+.game-panel {
+  max-width: 480px;
+  margin: 40px auto 0 auto;
+  padding: 24px 20px 32px 20px;
+  text-align: center;
+  background: rgba(58, 28, 113, 0.85);
+  border: 4px solid #ffe066;
+  box-shadow: 0 6px #3a1c71;
+  border-radius: 0;
+}
+
+.game-panel__title {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #ffe066;
+  text-shadow: 0 0 8px #3a1c71, 0 0 24px #ff9800;
+  margin-bottom: 18px;
+  animation: arcade-glow 1.5s infinite alternate;
+  letter-spacing: 2px;
+}
+
+@keyframes arcade-glow {
+  from {
+    text-shadow: 0 0 8px #3a1c71, 0 0 24px #ff9800;
+  }
+  to {
+    text-shadow: 0 0 16px #ffe066, 0 0 32px #ff9800;
+  }
+}
+
+.game-panel__controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.game-panel__difficulty-label {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  color: #ffe066;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.game-panel__difficulty-select {
+  background: #3a1c71;
+  color: #ffe066;
+  border: 2px solid #ffe066;
+  border-radius: 0;
+  padding: 4px 8px;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.game-panel__notes {
+  margin: 10px 0 0 0;
+}
+
+.game-panel__melody-notes,
+.game-panel__user-notes {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 6px 0;
+  flex-wrap: wrap;
+}
+
+.game-panel__note {
+  background: #3a1c71;
+  color: #ffe066;
+  padding: 8px 10px;
+  border-radius: 0;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-weight: bold;
+  font-size: 13px;
+  border: 2px solid #ffe066;
+  box-shadow: 0 2px 0 #ff9800;
+  min-width: 36px;
+  text-align: center;
+  margin: 0 1px;
+}
+
+.game-panel__note--matched {
+  background: #ff9800;
+  color: #fff;
+  border-color: #ffe066;
+  transform: scale(1.08);
+  box-shadow: 0 4px 0 #3a1c71;
+}
+
+.game-panel__note--user {
+  background: #ffe066;
+  color: #3a1c71;
+  border-color: #ff9800;
+}
+
+.game-panel__feedback {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  color: #ff6b6b;
+  text-shadow: 0 0 8px #3a1c71;
+  margin: 12px 0 0 0;
+  padding: 10px 0;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 0;
+  border: 2px solid #ff6b6b;
+  animation: arcade-pulse 0.5s ease-in-out;
+}
+
+@keyframes arcade-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.game-panel__instructions {
+  margin-top: 18px;
+  font-size: 0.7rem;
+  color: #ffe066;
+  opacity: 0.7;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  line-height: 1.5;
+} 

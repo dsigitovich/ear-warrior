@@ -1,0 +1,61 @@
+.button {
+  border: 3px solid #ffe066;
+  border-radius: 0;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.1s cubic-bezier(.4,2,.6,1);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #ff9800 0%, #ff6b6b 100%);
+  color: #fff;
+  box-shadow: 0 4px #3a1c71;
+  outline: none;
+  font-size: 13px;
+  padding: 8px 18px;
+  margin: 0 2px;
+  position: relative;
+}
+
+.button:active {
+  box-shadow: 0 2px #3a1c71;
+  top: 2px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.7);
+}
+
+.button--primary {
+  background: linear-gradient(90deg, #ff9800 0%, #ff6b6b 100%);
+  color: #fff;
+}
+
+.button--secondary {
+  background: linear-gradient(90deg, #00c3ff 0%, #ffff1c 100%);
+  color: #3a1c71;
+  border-color: #00c3ff;
+}
+
+.button--danger {
+  background: linear-gradient(90deg, #ff4757 0%, #c44569 100%);
+  color: #fff;
+  border-color: #ff4757;
+}
+
+.button--small {
+  padding: 5px 10px;
+  font-size: 10px;
+}
+
+.button--medium {
+  padding: 8px 18px;
+  font-size: 13px;
+}
+
+.button--large {
+  padding: 12px 28px;
+  font-size: 16px;
+} 

@@ -1,0 +1,28 @@
+.score-panel {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  background: #3a1c71;
+  border-radius: 0;
+  /* border: 3px solid #ffe066; */
+  /* box-shadow: 0 4px #3a1c71; */
+}
+
+.score-panel__item {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  color: #ffe066;
+  text-shadow: 0 0 6px #3a1c71;
+  padding: 4px 10px;
+  background: rgba(255, 224, 102, 0.08);
+  border-radius: 0;
+  margin: 0 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: none;
+} 
