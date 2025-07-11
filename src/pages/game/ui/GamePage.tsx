@@ -21,6 +21,7 @@ export const GamePage: React.FC = () => {
       <GamePanel
         score={game.stats.score}
         streak={game.stats.streak}
+        attemptsLeft={game.attemptsLeft}
         melody={melodyNotes}
         userInputNotes={game.userInput as any[]}
         matchedIndices={game.matchedIndices}
