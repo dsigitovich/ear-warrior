@@ -161,14 +161,14 @@ const App: React.FC = () => {
     let time = 0;
     newMelody.forEach((note) => {
       synth.triggerAttackRelease(note, '8n', Tone.now() + time);
-      time += 0.5;
+      time += 0.8;
     });
     setTimeout(() => {
       setIsPlaying(false);
       setIsListening(true);
       isListeningRef.current = true;
       startListening();
-    }, newMelody.length * 500 + 200);
+    }, newMelody.length * 800 + 200);
   };
 
   const startListening = async () => {
@@ -270,7 +270,7 @@ const App: React.FC = () => {
     let time = 0;
     melody.forEach((note: Note) => {
       synth.triggerAttackRelease(note, '8n', Tone.now() + time);
-      time += 0.5;
+      time += 0.8;
     });
   };
 
