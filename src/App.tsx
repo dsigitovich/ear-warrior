@@ -77,16 +77,6 @@ const DIFFICULTY_LEVELS = [
   { label: 'Hard', value: 'hard', notes: 8 },
 ];
 
-type Difficulty = 'easy' | 'medium' | 'hard';
-
-function getRandomMelody(length: number = 5): Note[] {
-  const melody: Note[] = [];
-  for (let i = 0; i < length; i++) {
-    melody.push(NOTES[Math.floor(Math.random() * NOTES.length)]);
-  }
-  return melody;
-}
-
 // Improved autocorrelation pitch detection
 function detectPitch(buffer: Float32Array, sampleRate: number): number | null {
   const windowed = buffer.map((v, i) => v * (0.5 - 0.5 * Math.cos((2 * Math.PI * i) / (buffer.length - 1))));
@@ -117,7 +107,6 @@ function detectPitch(buffer: Float32Array, sampleRate: number): number | null {
 
 const App: React.FC = () => {
   const [score, setScore] = useState(0);
-  const [streak, setStreak] = useState(0);
   const [melody, setMelody] = useState<Note[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -125,7 +114,6 @@ const App: React.FC = () => {
   const [detectedNote, setDetectedNote] = useState<Note | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [lastPitch, setLastPitch] = useState<number | null>(null);
-  // Set default difficulty
   const [difficulty, setDifficulty] = useState<'elementary' | 'easy' | 'medium' | 'hard'>('easy');
   const [userInputNotes, setUserInputNotes] = useState<Note[]>([]);
   const [userMatchedIndices, setUserMatchedIndices] = useState<number[]>([]);
@@ -157,7 +145,7 @@ const App: React.FC = () => {
     melodyRef.current = [...newMelody];
     setExpectedNote(newMelody[0]);
     await Tone.start();
-    const synth = new Tone.Synth().toDestination();
+    const synth = new Tone.AMSynth().toDestination();
     let time = 0;
     newMelody.forEach((note) => {
       synth.triggerAttackRelease(note, '8n', Tone.now() + time);
@@ -266,7 +254,7 @@ const App: React.FC = () => {
       await audioContextRef.current.resume();
     }
     await Tone.start();
-    const synth = new Tone.Synth().toDestination();
+    const synth = new Tone.AMSynth().toDestination();
     let time = 0;
     melody.forEach((note: Note) => {
       synth.triggerAttackRelease(note, '8n', Tone.now() + time);
@@ -342,7 +330,6 @@ const App: React.FC = () => {
       <h1>Ear Warrior</h1>
       <div className="score-panel">
         <span>Score: {score} ⭐</span>
-        <span>Streak: {streak} 🔥</span>
       </div>
       <div style={{ marginBottom: 16 }}>
         <label style={{ marginRight: 8 }}>
