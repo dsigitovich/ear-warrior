@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 /**
  * RoosterIcon renders a pixel-art rooster (cock) based on the provided image.
