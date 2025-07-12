@@ -22,3 +22,13 @@ export function detectPitchFromBuffer (buffer: Float32Array, sampleRate: number)
     note: null,
   }
 }
+
+export function calculateAverageFrequency (frequencies: number[]): number | null {
+  if (frequencies.length === 0) return null
+
+  const validFrequencies = frequencies.filter(f => f !== null && f > 0)
+  if (validFrequencies.length === 0) return null
+
+  const sum = validFrequencies.reduce((acc, freq) => acc + freq, 0)
+  return sum / validFrequencies.length
+}

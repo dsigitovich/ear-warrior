@@ -282,4 +282,4 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
       </div>
     </div>
   )
-} 
+}
