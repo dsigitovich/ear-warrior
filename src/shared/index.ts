@@ -2,4 +2,5 @@ export * from './types';
 export * from './config/constants';
 export * from './lib/note-utils';
 export * from './lib/pitch-detection';
-export * from './ui/Button'; 
+export * from './ui/Button';
+export * from './ui/RoosterIcon' 
