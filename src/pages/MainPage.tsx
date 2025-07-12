@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DIFFICULTY_LEVELS } from '../shared/config/constants'
 import { useDifficultyStore } from '../shared/store/difficulty-store'
+import { DuckIcon } from '../shared/ui/DuckIcon'
 
 export function MainPage () {
   const [selected, setSelected] = useState(DIFFICULTY_LEVELS[0].value)
@@ -15,6 +16,7 @@ export function MainPage () {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+      <DuckIcon width={72} height={54} />
       <label htmlFor='difficulty'>Select difficulty:</label>
       <select
         id='difficulty'
