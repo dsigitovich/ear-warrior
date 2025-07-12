@@ -1,0 +1,323 @@
+/* Unified Game Page Styles */
+.unified-game-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: linear-gradient(135deg, #3a1c71 0%, #d76d77 50%, #ffaf7b 100%);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.unified-game-container {
+  max-width: 600px;
+  width: 100%;
+  background: rgba(58, 28, 113, 0.95);
+  border: 4px solid #ffe066;
+  border-radius: 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+/* Header */
+.unified-game-header {
+  background: #3a1c71;
+  padding: 20px;
+  text-align: center;
+  border-bottom: 3px solid #ffe066;
+  position: relative;
+}
+
+.unified-game-title {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 1.8rem;
+  color: #ffe066;
+  text-shadow: 0 0 8px #3a1c71, 0 0 24px #ff9800;
+  margin: 10px 0 5px 0;
+  animation: arcade-glow 2s infinite alternate;
+  letter-spacing: 2px;
+}
+
+.unified-game-subtitle {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.6rem;
+  color: #d76d77;
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+@keyframes arcade-glow {
+  from {
+    text-shadow: 0 0 8px #3a1c71, 0 0 24px #ff9800;
+  }
+  to {
+    text-shadow: 0 0 16px #ffe066, 0 0 32px #ff9800;
+  }
+}
+
+/* Main Game Area */
+.unified-game-main {
+  padding: 24px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Start Screen */
+.unified-game-start {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.unified-game-difficulty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.unified-game-difficulty-label {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.8rem;
+  color: #ffe066;
+  letter-spacing: 1px;
+}
+
+.unified-game-difficulty-select {
+  background: #3a1c71;
+  color: #ffe066;
+  border: 2px solid #ffe066;
+  border-radius: 0;
+  padding: 8px 16px;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.unified-game-difficulty-select:hover {
+  background: #ffe066;
+  color: #3a1c71;
+}
+
+.unified-game-instructions {
+  background: rgba(255, 224, 102, 0.1);
+  border: 2px solid #ffe066;
+  border-radius: 0;
+  padding: 20px;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.6rem;
+  color: #ffe066;
+  line-height: 1.8;
+  max-width: 400px;
+}
+
+.unified-game-instructions p {
+  margin: 8px 0;
+}
+
+/* Active Game Screen */
+.unified-game-active {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.unified-game-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Notes Display */
+.unified-game-notes {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 10px 0;
+}
+
+.unified-game-notes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.unified-game-notes-label {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.6rem;
+  color: #ffe066;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.unified-game-melody-notes,
+.unified-game-user-notes {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.unified-game-note {
+  background: #3a1c71;
+  color: #ffe066;
+  padding: 8px 12px;
+  border-radius: 0;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-weight: bold;
+  font-size: 0.7rem;
+  border: 2px solid #ffe066;
+  box-shadow: 0 2px 0 #ff9800;
+  min-width: 40px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.unified-game-note--matched {
+  background: #ff9800;
+  color: #fff;
+  border-color: #ffe066;
+  transform: scale(1.1);
+  box-shadow: 0 4px 0 #3a1c71;
+  animation: noteMatch 0.3s ease;
+}
+
+.unified-game-note--user {
+  background: #ffe066;
+  color: #3a1c71;
+  border-color: #ff9800;
+}
+
+@keyframes noteMatch {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1.1); }
+}
+
+/* Feedback */
+.unified-game-feedback {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #ff6b6b;
+  text-shadow: 0 0 8px #3a1c71;
+  text-align: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid #ff6b6b;
+  border-radius: 0;
+  animation: feedbackPulse 0.5s ease-in-out;
+}
+
+@keyframes feedbackPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Status Display */
+.unified-game-status {
+  text-align: center;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.6rem;
+  color: #ffe066;
+  opacity: 0.9;
+  padding: 12px;
+  background: rgba(255, 224, 102, 0.05);
+  border: 1px solid rgba(255, 224, 102, 0.3);
+  border-radius: 0;
+}
+
+.unified-game-status-listening {
+  color: #4ecdc4;
+  animation: pulse 2s infinite;
+}
+
+.unified-game-status-playing {
+  color: #ff9800;
+  animation: pulse 1s infinite;
+}
+
+.unified-game-status-idle {
+  color: #ffe066;
+  opacity: 0.7;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .unified-game-container {
+    max-width: 100%;
+    margin: 10px;
+  }
+  
+  .unified-game-title {
+    font-size: 1.2rem;
+  }
+  
+  .unified-game-subtitle {
+    font-size: 0.5rem;
+  }
+  
+  .unified-game-main {
+    padding: 16px;
+  }
+  
+  .unified-game-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .unified-game-instructions {
+    font-size: 0.5rem;
+    padding: 16px;
+  }
+  
+  .unified-game-note {
+    font-size: 0.6rem;
+    padding: 6px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .unified-game-page {
+    padding: 10px;
+  }
+  
+  .unified-game-title {
+    font-size: 1rem;
+  }
+  
+  .unified-game-main {
+    padding: 12px;
+  }
+  
+  .unified-game-melody-notes,
+  .unified-game-user-notes {
+    gap: 4px;
+  }
+  
+  .unified-game-note {
+    font-size: 0.5rem;
+    padding: 4px 6px;
+    min-width: 32px;
+  }
+}
