@@ -33,7 +33,6 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   const [platforms, setPlatforms] = useState<Platform[]>([])
   const [roosterPosition, setRoosterPosition] = useState({ x: 400, y: 300 })
   const [roosterVelocity, setRoosterVelocity] = useState({ x: 2, y: 0 })
-  const [parallaxOffset, setParallaxOffset] = useState(0)
   const [isRoosterJumping, setIsRoosterJumping] = useState(false)
 
   // Генерируем платформы на основе мелодии
@@ -58,6 +57,43 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
       setPlatforms(newPlatforms)
     }
   }, [melodyLength, matchedIndices, currentNoteIndex, isListening, melodyNotes])
+
+  // Параметры для звездного параллакса
+  const STAR_LAYERS = 3
+  const STARS_PER_LAYER = 24
+  const STAR_COLORS = ['#ffe066', '#fffbe6', '#ffaf7b']
+  const STAR_SPEEDS = [0.2, 0.1, 0.05]
+  const STAR_SIZES = [2, 1.2, 0.7]
+  const CANVAS_WIDTH = 800
+  const CANVAS_HEIGHT = 600
+
+  // Генерируем звезды один раз
+  const [starField] = useState(() => {
+    const layers = []
+    for (let l = 0; l < STAR_LAYERS; l++) {
+      const stars = []
+      for (let i = 0; i < STARS_PER_LAYER; i++) {
+        stars.push({
+          x: Math.random() * CANVAS_WIDTH,
+          y: Math.random() * CANVAS_HEIGHT,
+        })
+      }
+      layers.push(stars)
+    }
+    return layers
+  })
+  const [starParallax, setStarParallax] = useState(0)
+
+  // Анимация параллакса звезд
+  useEffect(() => {
+    let raf: number
+    const animate = () => {
+      setStarParallax(prev => (prev + 1) % CANVAS_WIDTH)
+      raf = requestAnimationFrame(animate)
+    }
+    animate()
+    return () => cancelAnimationFrame(raf)
+  }, [])
 
   // Анимация петуха
   useEffect(() => {
@@ -114,7 +150,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
       })
 
       // Параллакс эффект для платформ
-      setParallaxOffset(prev => (prev + 1) % 1000)
+      // setParallaxOffset(prev => (prev + 1) % 1000) // Удалено
 
       animationId = requestAnimationFrame(animate)
     }
@@ -146,46 +182,40 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-    // Рисуем звезды (параллакс фон)
-    ctx.fillStyle = '#ffe066'
-    for (let i = 0; i < 50; i++) {
-      const x = (i * 17 + parallaxOffset * 0.1) % canvas.width
-      const y = (i * 23) % canvas.height
-      ctx.beginPath()
-      ctx.arc(x, y, 1, 0, 2 * Math.PI)
-      ctx.fill()
+    // Ретро звездное небо с параллаксом
+    for (let l = 0; l < STAR_LAYERS; l++) {
+      ctx.fillStyle = STAR_COLORS[l]
+      for (let i = 0; i < STARS_PER_LAYER; i++) {
+        const star = starField[l][i]
+        // Зацикленный параллакс
+        let x = (star.x + starParallax * STAR_SPEEDS[l]) % CANVAS_WIDTH
+        if (x < 0) x += CANVAS_WIDTH
+        ctx.beginPath()
+        ctx.arc(x, star.y, STAR_SIZES[l], 0, 2 * Math.PI)
+        ctx.fill()
+      }
     }
 
-    // Рисуем платформы
+    // Рисуем платформы (без параллакса)
     platforms.forEach((platform, index) => {
-      // Параллакс эффект для платформ
-      const parallaxX = platform.x - parallaxOffset * 0.5
-
-      // Цвет платформы в зависимости от состояния
+      const px = platform.x
       let color = '#3a1c71'
       if (platform.isMatched) {
         color = '#ff9800'
       } else if (platform.isCurrent) {
         color = '#ffe066'
       }
-
-      // Рисуем платформу
       ctx.fillStyle = color
-      ctx.fillRect(parallaxX, platform.y, platform.width, platform.height)
-
-      // Рисуем обводку
+      ctx.fillRect(px, platform.y, platform.width, platform.height)
       ctx.strokeStyle = '#ffe066'
       ctx.lineWidth = 2
-      ctx.strokeRect(parallaxX, platform.y, platform.width, platform.height)
-
-      // Рисуем номер ноты
+      ctx.strokeRect(px, platform.y, platform.width, platform.height)
       ctx.fillStyle = '#fff'
       ctx.font = 'bold 14px Arial'
       ctx.textAlign = 'center'
-      ctx.fillText(`${index + 1}`, parallaxX + platform.width / 2, platform.y + 15)
+      ctx.fillText(`${index + 1}`, px + platform.width / 2, platform.y + 15)
     })
-
-  }, [platforms, roosterPosition, parallaxOffset])
+  }, [platforms, roosterPosition, starField, starParallax])
 
   return (
     <div className="platform-game-container">
