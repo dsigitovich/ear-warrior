@@ -17,39 +17,43 @@
 }
 
 .unified-game-container {
-  max-width: 600px;
+  max-width: 700px;
   width: 100%;
+  max-height: 90vh;
   background: rgba(58, 28, 113, 0.95);
   border: 4px solid #ffe066;
   border-radius: 0;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Header */
 .unified-game-header {
   background: #3a1c71;
-  padding: 20px;
+  padding: 15px;
   text-align: center;
   border-bottom: 3px solid #ffe066;
   position: relative;
+  flex-shrink: 0;
 }
 
 .unified-game-title {
   font-family: 'Press Start 2P', Arial, sans-serif;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   color: #ffe066;
   text-shadow: 0 0 8px #3a1c71, 0 0 24px #ff9800;
-  margin: 10px 0 5px 0;
+  margin: 8px 0 3px 0;
   animation: arcade-glow 2s infinite alternate;
   letter-spacing: 2px;
 }
 
 .unified-game-subtitle {
   font-family: 'Press Start 2P', Arial, sans-serif;
-  font-size: 0.6rem;
+  font-size: 0.5rem;
   color: #d76d77;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   letter-spacing: 1px;
 }
 
@@ -64,32 +68,25 @@
 
 /* Main Game Area */
 .unified-game-main {
-  padding: 24px;
-  min-height: 400px;
+  padding: 20px;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  gap: 15px;
+  overflow-y: auto;
 }
 
-/* Start Screen */
-.unified-game-start {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 24px;
-}
-
+/* Difficulty Selector */
 .unified-game-difficulty {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .unified-game-difficulty-label {
   font-family: 'Press Start 2P', Arial, sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: #ffe066;
   letter-spacing: 1px;
 }
@@ -99,9 +96,9 @@
   color: #ffe066;
   border: 2px solid #ffe066;
   border-radius: 0;
-  padding: 8px 16px;
+  padding: 6px 12px;
   font-family: 'Press Start 2P', Arial, sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -111,29 +108,29 @@
   color: #3a1c71;
 }
 
+.unified-game-difficulty-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Instructions */
 .unified-game-instructions {
   background: rgba(255, 224, 102, 0.1);
   border: 2px solid #ffe066;
   border-radius: 0;
-  padding: 20px;
+  padding: 15px;
   font-family: 'Press Start 2P', Arial, sans-serif;
-  font-size: 0.6rem;
+  font-size: 0.5rem;
   color: #ffe066;
-  line-height: 1.8;
-  max-width: 400px;
+  line-height: 1.6;
+  text-align: center;
 }
 
 .unified-game-instructions p {
-  margin: 8px 0;
+  margin: 4px 0;
 }
 
-/* Active Game Screen */
-.unified-game-active {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
+/* Game Controls */
 .unified-game-controls {
   display: flex;
   gap: 8px;
@@ -146,19 +143,19 @@
 .unified-game-notes {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin: 10px 0;
+  gap: 12px;
+  margin: 5px 0;
 }
 
 .unified-game-notes-section {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .unified-game-notes-label {
   font-family: 'Press Start 2P', Arial, sans-serif;
-  font-size: 0.6rem;
+  font-size: 0.5rem;
   color: #ffe066;
   text-align: center;
   opacity: 0.8;
@@ -167,7 +164,7 @@
 .unified-game-melody-notes,
 .unified-game-user-notes {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   justify-content: center;
   flex-wrap: wrap;
 }
@@ -175,14 +172,14 @@
 .unified-game-note {
   background: #3a1c71;
   color: #ffe066;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 0;
   font-family: 'Press Start 2P', Arial, sans-serif;
   font-weight: bold;
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   border: 2px solid #ffe066;
   box-shadow: 0 2px 0 #ff9800;
-  min-width: 40px;
+  min-width: 35px;
   text-align: center;
   transition: all 0.2s;
 }
@@ -210,17 +207,15 @@
 
 /* Feedback */
 .unified-game-feedback {
-  font-family: 'Press Start 2P', Arial, sans-serif;
-  font-size: 0.8rem;
-  font-weight: bold;
-  color: #ff6b6b;
-  text-shadow: 0 0 8px #3a1c71;
   text-align: center;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid #ff6b6b;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.7rem;
+  color: #ffe066;
+  padding: 10px;
+  background: rgba(255, 224, 102, 0.1);
+  border: 2px solid #ffe066;
   border-radius: 0;
-  animation: feedbackPulse 0.5s ease-in-out;
+  animation: feedbackPulse 0.5s ease;
 }
 
 @keyframes feedbackPulse {
@@ -229,27 +224,25 @@
   100% { transform: scale(1); }
 }
 
-/* Status Display */
+/* Status */
 .unified-game-status {
   text-align: center;
   font-family: 'Press Start 2P', Arial, sans-serif;
-  font-size: 0.6rem;
+  font-size: 0.5rem;
   color: #ffe066;
-  opacity: 0.9;
-  padding: 12px;
+  padding: 6px;
   background: rgba(255, 224, 102, 0.05);
   border: 1px solid rgba(255, 224, 102, 0.3);
   border-radius: 0;
 }
 
 .unified-game-status-listening {
-  color: #4ecdc4;
-  animation: pulse 2s infinite;
+  color: #ff9800;
+  animation: listeningPulse 1s infinite;
 }
 
 .unified-game-status-playing {
-  color: #ff9800;
-  animation: pulse 1s infinite;
+  color: #d76d77;
 }
 
 .unified-game-status-idle {
@@ -257,67 +250,8 @@
   opacity: 0.7;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .unified-game-container {
-    max-width: 100%;
-    margin: 10px;
-  }
-  
-  .unified-game-title {
-    font-size: 1.2rem;
-  }
-  
-  .unified-game-subtitle {
-    font-size: 0.5rem;
-  }
-  
-  .unified-game-main {
-    padding: 16px;
-  }
-  
-  .unified-game-controls {
-    flex-direction: column;
-    gap: 8px;
-  }
-  
-  .unified-game-instructions {
-    font-size: 0.5rem;
-    padding: 16px;
-  }
-  
-  .unified-game-note {
-    font-size: 0.6rem;
-    padding: 6px 8px;
-  }
-}
-
-@media (max-width: 480px) {
-  .unified-game-page {
-    padding: 10px;
-  }
-  
-  .unified-game-title {
-    font-size: 1rem;
-  }
-  
-  .unified-game-main {
-    padding: 12px;
-  }
-  
-  .unified-game-melody-notes,
-  .unified-game-user-notes {
-    gap: 4px;
-  }
-  
-  .unified-game-note {
-    font-size: 0.5rem;
-    padding: 4px 6px;
-    min-width: 32px;
-  }
+@keyframes listeningPulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
 }

@@ -63,10 +63,10 @@ export const WaveformDisplay: React.FC<WaveformDisplayProps> = ({
         ctx.lineWidth = 2
         ctx.stroke()
         ctx.fillStyle = '#00c853'
-        ctx.font = '12px system-ui, Arial'
-        ctx.fillText(`${pitch.toFixed(1)} Hz`, x + 4, 16)
+        ctx.font = '14px system-ui, Arial'
+        ctx.fillText(`${pitch.toFixed(1)} Hz`, x + 4, 20)
         if (detectedNote) {
-          ctx.fillText(`${detectedNote}`, x + 4, 32)
+          ctx.fillText(`${detectedNote}`, x + 4, 40)
         }
       }
     }
@@ -76,26 +76,26 @@ export const WaveformDisplay: React.FC<WaveformDisplayProps> = ({
       matchedIndices.forEach((idx) => {
         const x = ((idx + 0.5) / melodyLength) * canvas.width
         ctx.beginPath()
-        ctx.arc(x, 12, 8, 0, 2 * Math.PI)
+        ctx.arc(x, 16, 10, 0, 2 * Math.PI)
         ctx.fillStyle = '#ff9800'
         ctx.globalAlpha = 0.8
         ctx.fill()
         ctx.globalAlpha = 1
         ctx.fillStyle = '#fff'
-        ctx.font = 'bold 12px system-ui, Arial'
+        ctx.font = 'bold 14px system-ui, Arial'
         ctx.textAlign = 'center'
-        ctx.fillText(`${idx + 1}`, x, 16)
+        ctx.fillText(`${idx + 1}`, x, 20)
       })
     }
   }
 
   return (
-    <div style={{ width: 500, margin: '0 auto', textAlign: 'center' }}>
+    <div className="waveform-container">
       <canvas
         ref={canvasRef}
         className="waveform-display"
-        width={500}
-        height={80}
+        width={600}
+        height={120}
       />
     </div>
   )
