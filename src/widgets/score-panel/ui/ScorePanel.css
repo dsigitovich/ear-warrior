@@ -14,32 +14,32 @@
 .score-panel--fullscreen {
   background: rgba(58, 28, 113, 0.7);
   box-shadow: 0 4px 32px #3a1c71;
-  margin: 24px auto 0 auto;
-  padding: 18px 32px;
+  margin: 16px auto 0 auto;
+  padding: 12px 24px;
   border: 2px solid #ffe066;
   border-radius: 12px;
-  font-size: 2rem;
-  gap: 32px;
+  font-size: 1.5rem;
+  gap: 24px;
   animation: fadeInDown 0.7s 0.2s both;
 }
 
 .score-panel--fullscreen .score-panel__item {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: #fffbe6;
   background: rgba(255, 224, 102, 0.18);
   text-shadow: 0 0 12px #3a1c71, 0 0 24px #ff9800;
-  padding: 10px 24px;
+  padding: 8px 16px;
   border-radius: 8px;
-  min-width: 140px;
+  min-width: 120px;
 }
 
 .score-panel--fullscreen .score-panel__item--attempts {
-  min-width: 180px;
-  gap: 12px;
+  min-width: 150px;
+  gap: 8px;
 }
 
 .score-panel--fullscreen .score-panel__hearts span {
-  font-size: 2rem;
+  font-size: 1.5rem;
   filter: drop-shadow(0 0 6px #ffe066);
 }
 
