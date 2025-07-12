@@ -35,7 +35,7 @@ export function RoosterIcon ({ width = 64, height = 64, jumping = false }: { wid
       shapeRendering="crispEdges"
       aria-label="Rooster logo"
       role="img"
-      style={jumping ? { animation: 'jumpMarioRooster 1.2s infinite cubic-bezier(.4,0,.6,1)' } : undefined}
+      style={jumping ? { animation: 'jumpMarioRooster 0.22s cubic-bezier(.4,0,.6,1)' } : undefined}
     >
       {/* Comb (red) */}
       <rect x="2" y="2" width="2" height="1" fill="#e74c3c" />

@@ -95,6 +95,43 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
     return () => cancelAnimationFrame(raf)
   }, [])
 
+  // Для отслеживания предыдущей ноты
+  const prevDetectedNoteRef = useRef<string | null>(null)
+  // Для блокировки прыжка после попадания
+  const [isLockedOnPlatform, setIsLockedOnPlatform] = useState(false)
+  // Для хранения id таймера прыжка
+  const jumpTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Реакция на новый звук пользователя
+  useEffect(() => {
+    if (!isListening) {
+      setIsRoosterJumping(false)
+      setIsLockedOnPlatform(false)
+      prevDetectedNoteRef.current = null
+      if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
+      return
+    }
+    if (detectedNote && detectedNote !== prevDetectedNoteRef.current) {
+      prevDetectedNoteRef.current = detectedNote
+      const currentPlatform = platforms.find((p) => p.isCurrent)
+      if (currentPlatform && detectedNote === currentPlatform.note) {
+        setIsRoosterJumping(false)
+        setIsLockedOnPlatform(true)
+        if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
+      } else if (!isLockedOnPlatform) {
+        setIsRoosterJumping(false)
+        if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
+        setTimeout(() => setIsRoosterJumping(true), 10)
+        jumpTimeoutRef.current = setTimeout(() => setIsRoosterJumping(false), 220)
+      }
+    }
+  }, [detectedNote, isListening, platforms, isLockedOnPlatform])
+
+  // Сброс блокировки при переходе к следующей платформе
+  useEffect(() => {
+    setIsLockedOnPlatform(false)
+  }, [currentNoteIndex])
+
   // Анимация петуха
   useEffect(() => {
     let animationId: number
