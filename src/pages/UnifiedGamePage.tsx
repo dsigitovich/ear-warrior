@@ -23,10 +23,6 @@ export function UnifiedGamePage () {
 
   const melodyNotes = game.currentMelody ? getMelodyNotes(game.currentMelody) : []
 
-  const handleNewGame = () => {
-    stopListening()
-  }
-
   const handlePlayAgain = () => {
     playMelody()
   }
@@ -92,14 +88,6 @@ export function UnifiedGamePage () {
                 </Button>
               </>
             )}
-
-            <Button
-              onClick={handleNewGame}
-              variant="secondary"
-              size="small"
-            >
-              New Game
-            </Button>
           </div>
 
           {/* Instructions - Always visible */}
