@@ -235,11 +235,13 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
           zIndex: 100,
         }}
       >
-        <RoosterIcon
-          width={64}
-          height={64}
-          jumping={isRoosterJumping}
-        />
+        <div style={{ transform: 'scaleX(-1)' }}>
+          <RoosterIcon
+            width={64}
+            height={64}
+            jumping={isRoosterJumping}
+          />
+        </div>
       </div>
     </div>
   )
