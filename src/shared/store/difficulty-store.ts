@@ -9,4 +9,4 @@ interface DifficultyState {
 export const useDifficultyStore = create<DifficultyState>(set => ({
   difficulty: 'elementary',
   setDifficulty: difficulty => set({ difficulty })
-})) 
+}))

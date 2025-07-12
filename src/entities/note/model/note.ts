@@ -1,5 +1,5 @@
-import { Note } from '../../../shared/types';
-import { getNoteFrequency } from '../../../shared/lib/note-utils';
+import { Note } from '../../../shared/types'
+import { getNoteFrequency } from '../../../shared/lib/note-utils'
 
 export interface NoteEntity {
   value: Note;
@@ -7,18 +7,18 @@ export interface NoteEntity {
   index: number;
 }
 
-export function createNote(note: Note): NoteEntity {
+export function createNote (note: Note): NoteEntity {
   return {
     value: note,
     frequency: getNoteFrequency(note),
     index: 0, // Will be set by melody
-  };
+  }
 }
 
-export function createNoteWithIndex(note: Note, index: number): NoteEntity {
+export function createNoteWithIndex (note: Note, index: number): NoteEntity {
   return {
     value: note,
     frequency: getNoteFrequency(note),
     index,
-  };
-} 
+  }
+}
