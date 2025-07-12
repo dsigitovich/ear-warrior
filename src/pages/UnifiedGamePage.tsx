@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useGameSession } from '../processes/game-session'
 import { getMelodyNotes } from '../entities/melody/model/melody'
 import { ScorePanel } from '../widgets/score-panel'
