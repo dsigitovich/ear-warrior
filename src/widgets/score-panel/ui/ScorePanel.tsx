@@ -5,11 +5,12 @@ import './ScorePanel.css'
 interface ScorePanelProps {
   stats: GameStats;
   attemptsLeft: number;
+  fullscreen?: boolean;
 }
 
-export const ScorePanel: React.FC<ScorePanelProps> = ({ stats, attemptsLeft }) => {
+export const ScorePanel: React.FC<ScorePanelProps> = ({ stats, attemptsLeft, fullscreen }) => {
   return (
-    <div className="score-panel">
+    <div className={`score-panel${fullscreen ? ' score-panel--fullscreen' : ''}`}>
       <span className="score-panel__item">
         Score: {stats.score} ⭐
       </span>
