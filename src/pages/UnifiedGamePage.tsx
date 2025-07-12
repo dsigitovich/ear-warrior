@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useGameSession } from '../processes/game-session'
 import { getMelodyNotes } from '../entities/melody/model/melody'
 import { ScorePanel } from '../widgets/score-panel'
@@ -39,6 +39,12 @@ export function UnifiedGamePage () {
   const handleReplay = () => {
     replayMelody()
   }
+
+  useEffect(() => {
+    if (isPlaying && game.attemptsLeft === 0) {
+      setTimeout(() => setIsPlaying(false), 1200)
+    }
+  }, [game.attemptsLeft, isPlaying])
 
   return (
     <div className="unified-game-page">
