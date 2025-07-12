@@ -27,6 +27,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: all 0.5s ease;
 }
 
 /* Header */
@@ -37,6 +38,12 @@
   border-bottom: 3px solid #ffe066;
   position: relative;
   flex-shrink: 0;
+  transition: all 0.5s ease;
+}
+
+.unified-game-header--playing {
+  padding: 10px;
+  transform: translateY(-20px);
 }
 
 .unified-game-title {
@@ -47,6 +54,12 @@
   margin: 8px 0 3px 0;
   animation: arcade-glow 2s infinite alternate;
   letter-spacing: 2px;
+  transition: all 0.5s ease;
+}
+
+.unified-game-header--playing .unified-game-title {
+  font-size: 1.2rem;
+  margin: 4px 0 2px 0;
 }
 
 .unified-game-subtitle {
@@ -55,6 +68,12 @@
   color: #d76d77;
   margin-bottom: 5px;
   letter-spacing: 1px;
+  transition: all 0.5s ease;
+}
+
+.unified-game-header--playing .unified-game-subtitle {
+  font-size: 0.4rem;
+  margin-bottom: 2px;
 }
 
 @keyframes arcade-glow {
@@ -74,6 +93,45 @@
   flex-direction: column;
   gap: 15px;
   overflow-y: auto;
+  position: relative;
+}
+
+/* Game Controls */
+.unified-game-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  transition: all 0.5s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.unified-game-controls--hidden {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+}
+
+/* Game Content */
+.unified-game-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  transition: all 0.5s ease;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.unified-game-content--hidden {
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 /* Difficulty Selector */
@@ -128,15 +186,6 @@
 
 .unified-game-instructions p {
   margin: 4px 0;
-}
-
-/* Game Controls */
-.unified-game-controls {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
 /* Notes Display */
@@ -254,4 +303,128 @@
   0% { opacity: 1; }
   50% { opacity: 0.7; }
   100% { opacity: 1; }
+}
+
+/* Waveform Display - Full Screen */
+.unified-game-waveform {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(58, 28, 113, 0.98);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.5s ease;
+  z-index: 10;
+}
+
+.unified-game-waveform--visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.fullscreen-header {
+  position: fixed;
+  top: 32px;
+  left: 0;
+  width: 100vw;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  animation: fadeInDown 0.5s;
+}
+
+.fullscreen-title {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 2.2rem;
+  color: #ffe066;
+  text-shadow: 0 0 16px #3a1c71, 0 0 32px #ff9800;
+  margin: 0 0 4px 0;
+  letter-spacing: 2px;
+  pointer-events: auto;
+  animation: fadeInDown 0.7s 0.1s both;
+}
+
+.fullscreen-subtitle {
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 1rem;
+  color: #d76d77;
+  margin-bottom: 0;
+  letter-spacing: 1px;
+  pointer-events: auto;
+  animation: fadeInDown 0.7s 0.2s both;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fullscreen-waveform {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #1a082d;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 99;
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fullscreen-waveform .waveform-container {
+  width: 100vw;
+  height: 50vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fullscreen-waveform .waveform-display {
+  width: 96vw;
+  max-width: 1800px;
+  height: 320px;
+  border: 3px solid #ffe066;
+  background: #000;
+  box-shadow: 0 4px 32px #3a1c71;
+}
+
+.unified-game-playing-controls {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 40px;
+  animation: fadeInUp 0.5s ease 0.3s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
