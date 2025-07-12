@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import * as Tone from 'tone'
 import { Difficulty } from '../../../shared/types'
 import { AUDIO_CONFIG, GAME_CONFIG } from '../../../shared/config/constants'
@@ -22,6 +22,13 @@ export function useGameSession () {
 
   // Update ref on every render
   gameMelodyRef.current = game.currentMelody
+
+  // Sync difficulty from store to game state
+  useEffect(() => {
+    if (game.difficulty !== difficulty) {
+      setGame(prev => ({ ...prev, difficulty }))
+    }
+  }, [difficulty, game.difficulty])
 
   const playMelody = useCallback(async () => {
     setGame(prev => ({ ...setGameState(prev, 'playing'), attemptsLeft: 3 }))

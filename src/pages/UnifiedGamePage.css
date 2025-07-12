@@ -111,6 +111,11 @@
   color: #3a1c71;
 }
 
+.unified-game-difficulty-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .unified-game-instructions {
   background: rgba(255, 224, 102, 0.1);
   border: 2px solid #ffe066;
@@ -210,17 +215,15 @@
 
 /* Feedback */
 .unified-game-feedback {
+  text-align: center;
   font-family: 'Press Start 2P', Arial, sans-serif;
   font-size: 0.8rem;
-  font-weight: bold;
-  color: #ff6b6b;
-  text-shadow: 0 0 8px #3a1c71;
-  text-align: center;
+  color: #ffe066;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid #ff6b6b;
+  background: rgba(255, 224, 102, 0.1);
+  border: 2px solid #ffe066;
   border-radius: 0;
-  animation: feedbackPulse 0.5s ease-in-out;
+  animation: feedbackPulse 0.5s ease;
 }
 
 @keyframes feedbackPulse {
@@ -229,27 +232,25 @@
   100% { transform: scale(1); }
 }
 
-/* Status Display */
+/* Status */
 .unified-game-status {
   text-align: center;
   font-family: 'Press Start 2P', Arial, sans-serif;
   font-size: 0.6rem;
   color: #ffe066;
-  opacity: 0.9;
-  padding: 12px;
+  padding: 8px;
   background: rgba(255, 224, 102, 0.05);
   border: 1px solid rgba(255, 224, 102, 0.3);
   border-radius: 0;
 }
 
 .unified-game-status-listening {
-  color: #4ecdc4;
-  animation: pulse 2s infinite;
+  color: #ff9800;
+  animation: listeningPulse 1s infinite;
 }
 
 .unified-game-status-playing {
-  color: #ff9800;
-  animation: pulse 1s infinite;
+  color: #d76d77;
 }
 
 .unified-game-status-idle {
@@ -257,9 +258,10 @@
   opacity: 0.7;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
+@keyframes listeningPulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
 }
 
 /* Responsive Design */

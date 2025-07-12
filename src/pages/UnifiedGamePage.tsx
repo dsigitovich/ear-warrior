@@ -10,11 +10,11 @@ import { useDifficultyStore } from '../shared/store/difficulty-store'
 import { Difficulty } from '../shared/types'
 import './UnifiedGamePage.css'
 
-export function UnifiedGamePage() {
+export function UnifiedGamePage () {
   const [gameStarted, setGameStarted] = useState(false)
   const difficulty = useDifficultyStore((s: any) => s.difficulty)
   const setDifficulty = useDifficultyStore((s: any) => s.setDifficulty)
-  
+
   const {
     game,
     audioBuffer,
@@ -22,7 +22,7 @@ export function UnifiedGamePage() {
     stopListening,
     replayMelody,
   } = useGameSession()
-  
+
   const melodyNotes = game.currentMelody ? getMelodyNotes(game.currentMelody) : []
 
   const handleStartGame = () => {
@@ -74,11 +74,11 @@ export function UnifiedGamePage() {
                   ))}
                 </select>
               </div>
-              
+
               <Button onClick={handleStartGame} variant="primary" size="large">
                 Start Game
               </Button>
-              
+
               <div className="unified-game-instructions">
                 <p>🎵 Listen to the melody and sing it back!</p>
                 <p>🎤 Use your microphone to match the notes</p>
@@ -98,7 +98,7 @@ export function UnifiedGamePage() {
                 >
                   {game.state === 'playing' ? 'Playing...' : 'Play Melody'}
                 </Button>
-                
+
                 {game.state === 'listening' && (
                   <>
                     <Button
@@ -117,7 +117,7 @@ export function UnifiedGamePage() {
                     </Button>
                   </>
                 )}
-                
+
                 <Button
                   onClick={handleNewGame}
                   variant="secondary"
@@ -125,6 +125,24 @@ export function UnifiedGamePage() {
                 >
                   New Game
                 </Button>
+              </div>
+
+              {/* Difficulty Selector - Always visible */}
+              <div className="unified-game-difficulty">
+                <label htmlFor="difficulty-game" className="unified-game-difficulty-label">
+                  Difficulty:
+                </label>
+                <select
+                  id="difficulty-game"
+                  value={difficulty}
+                  onChange={e => setDifficulty(e.target.value as Difficulty)}
+                  className="unified-game-difficulty-select"
+                  disabled={game.state === 'playing' || game.state === 'listening'}
+                >
+                  {DIFFICULTY_LEVELS.map(level => (
+                    <option key={level.value} value={level.value}>{level.label}</option>
+                  ))}
+                </select>
               </div>
 
               {/* Waveform Display */}
@@ -156,7 +174,7 @@ export function UnifiedGamePage() {
                     </div>
                   </div>
                 )}
-                
+
                 {game.userInput.length > 0 && (
                   <div className="unified-game-notes-section">
                     <div className="unified-game-notes-label">Your Input:</div>
