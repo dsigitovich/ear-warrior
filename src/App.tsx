@@ -1,10 +1,11 @@
-import React from 'react'
-import { UnifiedGamePage } from './pages/UnifiedGamePage'
+import { AnalyticsPage } from './pages/analytics'
 import './App.css'
 
-const App: React.FC = () => {
+function App() {
   return (
-    <UnifiedGamePage />
+    <div className="App">
+      <AnalyticsPage />
+    </div>
   )
 }
 
