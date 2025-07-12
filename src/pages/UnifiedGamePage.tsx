@@ -8,6 +8,7 @@ import { RoosterIcon } from '../shared/ui/RoosterIcon'
 import { DIFFICULTY_LEVELS } from '../shared/config/constants'
 import { useDifficultyStore } from '../shared/store/difficulty-store'
 import { Difficulty } from '../shared/types'
+import { getRandomSmokeText, getSmokeTexts } from '../shared/lib/smoke-texts'
 import './UnifiedGamePage.css'
 
 export function UnifiedGamePage () {
@@ -123,10 +124,22 @@ export function UnifiedGamePage () {
               </div>
               <ScorePanel stats={game.stats} attemptsLeft={game.attemptsLeft} />
               <div className="unified-game-instructions">
-                <p>🎵 Listen to the melody and sing it back!</p>
-                <p>🎤 Use your microphone to match the notes</p>
-                <p>⭐ Earn points for correct sequences</p>
-                <p>🔥 Build your streak for bonus points</p>
+                <h3>🎵 How to Play</h3>
+                {getSmokeTexts('instructions', 4).map((instruction, idx) => (
+                  <p key={idx}>• {instruction}</p>
+                ))}
+              </div>
+              <div className="unified-game-tips">
+                <h3>💡 Pro Tips</h3>
+                {getSmokeTexts('tips', 3).map((tip, idx) => (
+                  <p key={idx}>• {tip}</p>
+                ))}
+              </div>
+              <div className="unified-game-features">
+                <h3>🎯 Game Features</h3>
+                {getSmokeTexts('features', 3).map((feature, idx) => (
+                  <p key={idx}>• {feature}</p>
+                ))}
               </div>
               <div className="unified-game-notes">
                 {melodyNotes.length > 0 && (
@@ -163,22 +176,32 @@ export function UnifiedGamePage () {
                 <div className="unified-game-feedback">
                   {game.feedback}
                   {game.feedback === 'Success!' ? ' 🎉' : game.feedback === 'Try again!' ? ' ❌' : ''}
+                  {game.feedback === 'Success!' && (
+                    <p className="unified-game-feedback-encouragement">
+                      {getRandomSmokeText('progressMessages')}
+                    </p>
+                  )}
+                  {game.feedback === 'Try again!' && (
+                    <p className="unified-game-feedback-encouragement">
+                      {getRandomSmokeText('encouragements')}
+                    </p>
+                  )}
                 </div>
               )}
               <div className="unified-game-status">
                 {game.state === 'listening' && (
                   <div className="unified-game-status-listening">
-                    🎤 Listening... {game.detectedNote ? `Detected: ${game.detectedNote}` : 'Sing the melody!'}
+                    🎤 {getRandomSmokeText('gameStates')} {game.detectedNote ? `Detected: ${game.detectedNote}` : 'Sing the melody!'}
                   </div>
                 )}
                 {game.state === 'playing' && (
                   <div className="unified-game-status-playing">
-                    🎵 Playing melody...
+                    🎵 {getRandomSmokeText('loadingStates')}
                   </div>
                 )}
                 {game.state === 'idle' && melodyNotes.length === 0 && (
                   <div className="unified-game-status-idle">
-                    Press "Play Melody" to start a new challenge!
+                    {getRandomSmokeText('encouragements')}
                   </div>
                 )}
               </div>

@@ -181,11 +181,77 @@
   font-size: 0.5rem;
   color: #ffe066;
   line-height: 1.6;
+  text-align: left;
+}
+
+.unified-game-instructions h3 {
+  margin: 0 0 10px 0;
+  font-size: 0.6rem;
+  color: #ffe066;
   text-align: center;
+  text-shadow: 0 0 8px #3a1c71;
 }
 
 .unified-game-instructions p {
   margin: 4px 0;
+}
+
+/* Tips */
+.unified-game-tips {
+  background: rgba(215, 109, 119, 0.1);
+  border: 2px solid #d76d77;
+  border-radius: 0;
+  padding: 15px;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.5rem;
+  color: #d76d77;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.unified-game-tips h3 {
+  margin: 0 0 10px 0;
+  font-size: 0.6rem;
+  color: #d76d77;
+  text-align: center;
+  text-shadow: 0 0 8px #3a1c71;
+}
+
+.unified-game-tips p {
+  margin: 4px 0;
+}
+
+/* Features */
+.unified-game-features {
+  background: rgba(255, 175, 123, 0.1);
+  border: 2px solid #ffaf7b;
+  border-radius: 0;
+  padding: 15px;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.5rem;
+  color: #ffaf7b;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.unified-game-features h3 {
+  margin: 0 0 10px 0;
+  font-size: 0.6rem;
+  color: #ffaf7b;
+  text-align: center;
+  text-shadow: 0 0 8px #3a1c71;
+}
+
+.unified-game-features p {
+  margin: 4px 0;
+}
+
+/* Feedback encouragement */
+.unified-game-feedback-encouragement {
+  margin-top: 8px;
+  font-size: 0.5rem;
+  opacity: 0.8;
+  font-style: italic;
 }
 
 /* Notes Display */

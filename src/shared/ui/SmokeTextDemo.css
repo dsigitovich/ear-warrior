@@ -1,0 +1,152 @@
+.smoke-text-demo {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  background: rgba(58, 28, 113, 0.95);
+  border: 2px solid #ffe066;
+  border-radius: 0;
+  color: #ffe066;
+}
+
+.smoke-text-demo h2 {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #ffe066;
+  text-shadow: 0 0 8px #3a1c71;
+}
+
+.smoke-text-demo h3 {
+  font-size: 0.8rem;
+  margin: 15px 0 10px 0;
+  color: #d76d77;
+  text-shadow: 0 0 4px #3a1c71;
+}
+
+.smoke-text-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+}
+
+.smoke-text-category-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.smoke-text-category-selector label {
+  font-size: 0.6rem;
+  color: #ffe066;
+}
+
+.smoke-text-category-selector select {
+  background: #3a1c71;
+  color: #ffe066;
+  border: 2px solid #ffe066;
+  border-radius: 0;
+  padding: 8px 12px;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.smoke-text-category-selector select:hover {
+  background: #ffe066;
+  color: #3a1c71;
+}
+
+.smoke-text-display {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(255, 224, 102, 0.1);
+  border: 2px solid #ffe066;
+  border-radius: 0;
+  min-height: 60px;
+}
+
+.smoke-text-random {
+  font-size: 0.5rem;
+  line-height: 1.6;
+  color: #ffe066;
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+}
+
+.smoke-text-sample {
+  margin-bottom: 20px;
+}
+
+.smoke-text-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.smoke-text-item {
+  background: rgba(215, 109, 119, 0.1);
+  border: 1px solid #d76d77;
+  border-radius: 0;
+  padding: 10px;
+  font-size: 0.45rem;
+  line-height: 1.5;
+  color: #d76d77;
+  transition: all 0.2s;
+}
+
+.smoke-text-item:hover {
+  background: rgba(215, 109, 119, 0.2);
+  border-color: #ffe066;
+  color: #ffe066;
+}
+
+.smoke-text-category {
+  margin-bottom: 30px;
+  padding: 15px;
+  background: rgba(255, 175, 123, 0.05);
+  border: 2px solid #ffaf7b;
+  border-radius: 0;
+}
+
+.smoke-text-category h3 {
+  color: #ffaf7b;
+  border-bottom: 1px solid #ffaf7b;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+}
+
+.smoke-text-category .smoke-text-item {
+  border-color: #ffaf7b;
+  color: #ffaf7b;
+  background: rgba(255, 175, 123, 0.1);
+}
+
+.smoke-text-category .smoke-text-item:hover {
+  background: rgba(255, 175, 123, 0.2);
+  border-color: #ffe066;
+  color: #ffe066;
+}
+
+@media (max-width: 600px) {
+  .smoke-text-demo {
+    padding: 15px;
+  }
+  
+  .smoke-text-demo h2 {
+    font-size: 1rem;
+  }
+  
+  .smoke-text-demo h3 {
+    font-size: 0.7rem;
+  }
+  
+  .smoke-text-item {
+    font-size: 0.4rem;
+  }
+}
