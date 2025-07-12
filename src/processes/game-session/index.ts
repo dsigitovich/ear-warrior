@@ -1,1 +1,1 @@
-export { useGameSession } from './model/game-session'; 
+export { useGameSession } from './model/game-session'

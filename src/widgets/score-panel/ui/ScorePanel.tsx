@@ -1,6 +1,6 @@
-import React from 'react';
-import { GameStats } from '../../../shared/types';
-import './ScorePanel.css';
+import React from 'react'
+import { GameStats } from '../../../shared/types'
+import './ScorePanel.css'
 
 interface ScorePanelProps {
   stats: GameStats;
@@ -25,5 +25,5 @@ export const ScorePanel: React.FC<ScorePanelProps> = ({ stats, attemptsLeft }) =
         </span>
       </span>
     </div>
-  );
-}; 
+  )
+}

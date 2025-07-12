@@ -1,8 +1,8 @@
-import { GamePanel } from '../../../widgets/game-panel';
-import { useGameSession } from '../../../processes/game-session';
-import { getMelodyNotes } from '../../../entities/melody/model/melody';
-import './GamePage.css';
-import { useNavigate } from 'react-router-dom';
+import { GamePanel } from '../../../widgets/game-panel'
+import { useGameSession } from '../../../processes/game-session'
+import { getMelodyNotes } from '../../../entities/melody/model/melody'
+import './GamePage.css'
+import { useNavigate } from 'react-router-dom'
 
 export function GamePage () {
   const {
@@ -11,9 +11,9 @@ export function GamePage () {
     playMelody,
     stopListening,
     replayMelody,
-  } = useGameSession();
-  const melodyNotes = game.currentMelody ? getMelodyNotes(game.currentMelody) : [];
-  const navigate = useNavigate();
+  } = useGameSession()
+  const melodyNotes = game.currentMelody ? getMelodyNotes(game.currentMelody) : []
+  const navigate = useNavigate()
 
   return (
     <div className="game-page">
@@ -42,5 +42,5 @@ export function GamePage () {
         onReplayMelody={replayMelody}
       />
     </div>
-  );
-} 
+  )
+}
