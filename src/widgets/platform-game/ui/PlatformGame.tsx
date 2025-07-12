@@ -211,17 +211,6 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
           jumping={isRoosterJumping}
         />
       </div>
-      {/* Отладочная информация (можно убрать после проверки) */}
-      <div style={{
-        position: 'absolute',
-        top: 10,
-        left: 10,
-        color: 'white',
-        fontSize: '12px',
-        zIndex: 1000,
-      }}>
-        Rooster: x={roosterPosition.x}, y={roosterPosition.y}
-      </div>
     </div>
   )
 } 
