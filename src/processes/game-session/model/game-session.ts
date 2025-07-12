@@ -116,10 +116,8 @@ export function useGameSession () {
               } else {
                 setGame(prev => setFeedback(prev, 'Try again!'))
                 setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
-                setTimeout(() => replayMelody(), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
-                setTimeout(() => {
-                  isProcessingRef.current = false
-                }, 700)
+                replayMelody()
+                isProcessingRef.current = false
                 return { ...newGame, attemptsLeft: attempts }
               }
             }
