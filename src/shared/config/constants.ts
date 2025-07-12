@@ -38,6 +38,7 @@ export const AUDIO_CONFIG = {
   MIN_RMS: 0.01,
   NOTE_DURATION: '8n',
   NOTE_INTERVAL: 0.8,
+  RECORDING_DURATION: 1000, // 1 second in milliseconds
 } as const
 
 export const GAME_CONFIG = {

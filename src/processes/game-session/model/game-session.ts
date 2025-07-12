@@ -3,11 +3,12 @@ import * as Tone from 'tone'
 import { Difficulty } from '../../../shared/types'
 import { AUDIO_CONFIG, GAME_CONFIG } from '../../../shared/config/constants'
 import { generateMelodyWithIntervals } from '../../../features/melody-generation/model/melody-generator'
-import { detectPitchFromBuffer } from '../../../features/pitch-detection/model/pitch-detector'
+import { detectPitchFromBuffer, calculateAverageFrequency } from '../../../features/pitch-detection/model/pitch-detector'
 import { checkMelodyMatch } from '../../../features/game-logic/model/game-logic'
 import { createMelody } from '../../../entities/melody/model/melody'
 import { GameEntity, createGame, updateGameStats, setGameState, setCurrentMelody, addUserInput, setMatchedIndices, setFeedback, setDetectedPitch, setDetectedNote, resetGameInput } from '../../../entities/game/model/game'
 import { useDifficultyStore } from '../../../shared/store/difficulty-store'
+import { findClosestNote } from '../../../shared/lib/note-utils'
 
 export function useGameSession () {
   const difficulty = useDifficultyStore(s => s.difficulty)
@@ -20,6 +21,11 @@ export function useGameSession () {
   const gameMelodyRef = useRef<GameEntity['currentMelody']>(null)
   const isProcessingRef = useRef(false)
 
+  // New state for 1-second recording
+  const recordingStartTimeRef = useRef<number | null>(null)
+  const accumulatedFrequenciesRef = useRef<number[]>([])
+  const recordingTimeoutRef = useRef<number | null>(null)
+
   // Update ref on every render
   gameMelodyRef.current = game.currentMelody
 
@@ -29,6 +35,104 @@ export function useGameSession () {
       setGame(prev => ({ ...prev, difficulty }))
     }
   }, [difficulty, game.difficulty])
+
+  // Helper functions for recording period
+  const startRecordingPeriod = useCallback(() => {
+    recordingStartTimeRef.current = Date.now()
+    accumulatedFrequenciesRef.current = []
+
+    // Clear any existing timeout
+    if (recordingTimeoutRef.current) {
+      clearTimeout(recordingTimeoutRef.current)
+    }
+
+    // Set timeout for 1 second
+    recordingTimeoutRef.current = setTimeout(() => {
+      finishRecordingPeriod()
+    }, AUDIO_CONFIG.RECORDING_DURATION)
+  }, [])
+
+  const finishRecordingPeriod = useCallback(() => {
+    const averageFrequency = calculateAverageFrequency(accumulatedFrequenciesRef.current)
+
+    if (averageFrequency) {
+      const detectedNote = findClosestNote(averageFrequency)
+      setGame(prev => setDetectedPitch(prev, averageFrequency))
+      setGame(prev => setDetectedNote(prev, detectedNote))
+
+      // Process the detected note
+      if (detectedNote && gameMelodyRef.current && !isProcessingRef.current) {
+        isProcessingRef.current = true
+
+        setGame(prev => {
+          const newGame = addUserInput(prev, detectedNote)
+          let attempts = prev.attemptsLeft
+          const result = checkMelodyMatch(
+            newGame.userInput,
+            gameMelodyRef.current!,
+            newGame.stats.score,
+            newGame.stats.streak
+          )
+
+          if (!result.isCorrect) {
+            attempts = prev.attemptsLeft - 1
+            if (attempts <= 0) {
+              setGame(prev => setFeedback(prev, 'No attempts left!'))
+              setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
+              setTimeout(() => stopListening(), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
+              setTimeout(() => {
+                isProcessingRef.current = false
+              }, 700)
+              return { ...resetGameInput(newGame), attemptsLeft: 0 }
+            } else {
+              setGame(prev => setFeedback(prev, 'Try again!'))
+              setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
+              replayMelody()
+              isProcessingRef.current = false
+              return { ...newGame, attemptsLeft: attempts }
+            }
+          }
+
+          const updatedGame = setMatchedIndices(newGame, result.matchedIndices)
+          if (!result.shouldContinue) {
+            setGame(prev => setFeedback(prev, 'Success!'))
+            setGame(prev => updateGameStats(prev, result.score, result.streak))
+            setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.FEEDBACK_DURATION)
+            setTimeout(() => stopListening(), GAME_CONFIG.SUCCESS_DELAY)
+            setTimeout(() => {
+              isProcessingRef.current = false
+            }, 700)
+            return { ...updatedGame, attemptsLeft: 3 }
+          }
+
+          // Start new recording period for next note
+          setTimeout(() => {
+            startRecordingPeriod()
+            isProcessingRef.current = false
+          }, 100)
+
+          return { ...updatedGame, attemptsLeft: attempts }
+        })
+      }
+    } else {
+      // No valid frequency detected, start new recording period
+      setTimeout(() => {
+        startRecordingPeriod()
+      }, 100)
+    }
+
+    // Clear timeout reference
+    recordingTimeoutRef.current = null
+  }, [])
+
+  const clearRecordingPeriod = useCallback(() => {
+    if (recordingTimeoutRef.current) {
+      clearTimeout(recordingTimeoutRef.current)
+      recordingTimeoutRef.current = null
+    }
+    recordingStartTimeRef.current = null
+    accumulatedFrequenciesRef.current = []
+  }, [])
 
   const playMelody = useCallback(async () => {
     setGame(prev => ({ ...setGameState(prev, 'playing'), attemptsLeft: 3 }))
@@ -61,6 +165,7 @@ export function useGameSession () {
       setGame(prev => setGameState(prev, 'listening'))
       isListeningRef.current = true
       startListening()
+      startRecordingPeriod()
     }, newMelodyNotes.length * AUDIO_CONFIG.NOTE_INTERVAL * 1000 + 200)
   }, [game.difficulty])
 
@@ -87,62 +192,21 @@ export function useGameSession () {
         if (!isListeningRef.current || !gameMelodyRef.current || isProcessingRef.current) {
           return
         }
-        isProcessingRef.current = true
-        const input = event.inputBuffer.getChannelData(0)
-        setAudioBuffer(new Float32Array(input))
-        const pitchResult = detectPitchFromBuffer(input, audioContextRef.current!.sampleRate)
-        setGame(prev => setDetectedPitch(prev, pitchResult.frequency))
-        setGame(prev => setDetectedNote(prev, pitchResult.note))
-        if (pitchResult.note) {
-          setGame(prev => {
-            const newGame = addUserInput(prev, pitchResult.note!)
-            let attempts = prev.attemptsLeft
-            const result = checkMelodyMatch(
-              newGame.userInput,
-              gameMelodyRef.current!,
-              newGame.stats.score,
-              newGame.stats.streak
-            )
-            if (!result.isCorrect) {
-              attempts = prev.attemptsLeft - 1
-              if (attempts <= 0) {
-                setGame(prev => setFeedback(prev, 'No attempts left!'))
-                setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
-                setTimeout(() => stopListening(), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
-                setTimeout(() => {
-                  isProcessingRef.current = false
-                }, 700)
-                return { ...resetGameInput(newGame), attemptsLeft: 0 }
-              } else {
-                setGame(prev => setFeedback(prev, 'Try again!'))
-                setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
-                replayMelody()
-                isProcessingRef.current = false
-                return { ...newGame, attemptsLeft: attempts }
-              }
-            }
-            const updatedGame = setMatchedIndices(newGame, result.matchedIndices)
-            if (!result.shouldContinue) {
-              setGame(prev => setFeedback(prev, 'Success!'))
-              setGame(prev => updateGameStats(prev, result.score, result.streak))
-              setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.FEEDBACK_DURATION)
-              setTimeout(() => stopListening(), GAME_CONFIG.SUCCESS_DELAY)
-              setTimeout(() => {
-                isProcessingRef.current = false
-              }, 700)
-              return { ...updatedGame, attemptsLeft: 3 }
-            }
-            setTimeout(() => {
-              isProcessingRef.current = false
-            }, 700)
-            return { ...updatedGame, attemptsLeft: attempts }
-          })
-        } else {
-          setGame(prev => setDetectedNote(prev, null))
-          setGame(prev => setDetectedPitch(prev, null))
-          setTimeout(() => {
-            isProcessingRef.current = false
-          }, 700)
+
+        // Only accumulate frequencies if we're in a recording period
+        if (recordingStartTimeRef.current) {
+          const input = event.inputBuffer.getChannelData(0)
+          setAudioBuffer(new Float32Array(input))
+          const pitchResult = detectPitchFromBuffer(input, audioContextRef.current!.sampleRate)
+
+          // Accumulate valid frequencies
+          if (pitchResult.frequency && pitchResult.frequency > 0) {
+            accumulatedFrequenciesRef.current.push(pitchResult.frequency)
+          }
+
+          // Show current detection for visual feedback
+          setGame(prev => setDetectedPitch(prev, pitchResult.frequency))
+          setGame(prev => setDetectedNote(prev, pitchResult.note))
         }
       }
 
@@ -158,11 +222,14 @@ export function useGameSession () {
     setGame(prev => setCurrentMelody(prev, null))
     setGame(prev => resetGameInput(prev))
 
+    // Clear recording period
+    clearRecordingPeriod()
+
     if (processorRef.current) {
       processorRef.current.disconnect()
       processorRef.current = null
     }
-  }, [])
+  }, [clearRecordingPeriod])
 
   const replayMelody = useCallback(async () => {
     if (!game.currentMelody) return
