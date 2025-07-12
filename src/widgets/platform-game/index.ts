@@ -1,0 +1,1 @@
+export { PlatformGame } from './ui/PlatformGame' 

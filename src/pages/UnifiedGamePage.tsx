@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useGameSession } from '../processes/game-session'
 import { getMelodyNotes } from '../entities/melody/model/melody'
 import { ScorePanel } from '../widgets/score-panel'
-import { WaveformDisplay } from '../widgets/waveform-display'
+import { PlatformGame } from '../widgets/platform-game'
 import { Button } from '../shared/ui/Button'
 import { RoosterIcon } from '../shared/ui/RoosterIcon'
 import { DIFFICULTY_LEVELS } from '../shared/config/constants'
@@ -17,7 +17,6 @@ export function UnifiedGamePage () {
 
   const {
     game,
-    audioBuffer,
     playMelody,
     stopListening,
     replayMelody,
@@ -55,13 +54,13 @@ export function UnifiedGamePage () {
             </div>
           </div>
           <div className="fullscreen-waveform">
-            <WaveformDisplay
-              buffer={audioBuffer}
-              pitch={game.detectedPitch}
+            <PlatformGame
               detectedNote={game.detectedNote}
               matchedIndices={game.matchedIndices}
               melodyLength={melodyNotes.length}
-              sampleRate={44100}
+              currentNoteIndex={game.userInput.length}
+              isListening={game.state === 'listening'}
+              melodyNotes={melodyNotes}
             />
             <div className="unified-game-playing-controls">
               {game.state === 'listening' && (
