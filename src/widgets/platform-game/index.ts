@@ -1,1 +1,1 @@
-export { PlatformGame } from './ui/PlatformGame' 
+export { PlatformGame } from './ui/PlatformGame'

@@ -88,7 +88,11 @@ export function useGameSession () {
               setGame(prev => setFeedback(prev, 'Try again!'))
               setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
               replayMelody()
-              isProcessingRef.current = false
+              // Start new recording period after replay
+              setTimeout(() => {
+                startRecordingPeriod()
+                isProcessingRef.current = false
+              }, 700)
               return { ...newGame, attemptsLeft: attempts }
             }
           }
