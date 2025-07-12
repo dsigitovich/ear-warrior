@@ -50,6 +50,9 @@ export function UnifiedGamePage () {
             <RoosterIcon width={64} height={48} jumping={game.state === 'playing'} />
             <h1 className="fullscreen-title">Ear Warrior</h1>
             <div className="fullscreen-subtitle">Train Your Musical Ear</div>
+            <div className="fullscreen-score-panel-wrapper">
+              <ScorePanel stats={game.stats} attemptsLeft={game.attemptsLeft} fullscreen />
+            </div>
           </div>
           <div className="fullscreen-waveform">
             <WaveformDisplay
