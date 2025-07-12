@@ -1,7 +1,6 @@
 import { useGameSession } from '../processes/game-session'
 import { getMelodyNotes } from '../entities/melody/model/melody'
 import { ScorePanel } from '../widgets/score-panel'
-import { WaveformDisplay } from '../widgets/waveform-display'
 import { Button } from '../shared/ui/Button'
 import { RoosterIcon } from '../shared/ui/RoosterIcon'
 import { DIFFICULTY_LEVELS } from '../shared/config/constants'
@@ -15,7 +14,6 @@ export function UnifiedGamePage () {
 
   const {
     game,
-    audioBuffer,
     playMelody,
     stopListening,
     replayMelody,
@@ -98,15 +96,15 @@ export function UnifiedGamePage () {
             <p>🔥 Build your streak for bonus points</p>
           </div>
 
-          {/* Waveform Display */}
-          <WaveformDisplay
+          {/* Waveform Display - Temporarily hidden */}
+          {/* <WaveformDisplay
             buffer={audioBuffer}
             pitch={game.detectedPitch}
             detectedNote={game.detectedNote}
             matchedIndices={game.matchedIndices}
             melodyLength={melodyNotes.length}
             sampleRate={44100}
-          />
+          /> */}
 
           {/* Notes Display */}
           <div className="unified-game-notes">
