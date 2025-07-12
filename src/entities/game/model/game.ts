@@ -1,5 +1,5 @@
-import { GameState, GameStats, Difficulty } from '../../../shared/types';
-import { MelodyEntity } from '../../melody/model/melody';
+import { GameState, GameStats, Difficulty } from '../../../shared/types'
+import { MelodyEntity } from '../../melody/model/melody'
 
 export interface GameEntity {
   state: GameState;
@@ -14,7 +14,7 @@ export interface GameEntity {
   attemptsLeft: number;
 }
 
-export function createGame(difficulty: Difficulty = 'easy'): GameEntity {
+export function createGame (difficulty: Difficulty = 'easy'): GameEntity {
   return {
     state: 'idle',
     stats: {
@@ -29,69 +29,69 @@ export function createGame(difficulty: Difficulty = 'easy'): GameEntity {
     detectedPitch: null,
     detectedNote: null,
     attemptsLeft: 3,
-  };
+  }
 }
 
-export function updateGameStats(game: GameEntity, score: number, streak: number): GameEntity {
+export function updateGameStats (game: GameEntity, score: number, streak: number): GameEntity {
   return {
     ...game,
     stats: {
       score,
       streak,
     },
-  };
+  }
 }
 
-export function setGameState(game: GameEntity, state: GameState): GameEntity {
+export function setGameState (game: GameEntity, state: GameState): GameEntity {
   return {
     ...game,
     state,
-  };
+  }
 }
 
-export function setCurrentMelody(game: GameEntity, melody: MelodyEntity | null): GameEntity {
+export function setCurrentMelody (game: GameEntity, melody: MelodyEntity | null): GameEntity {
   return {
     ...game,
     currentMelody: melody,
-  };
+  }
 }
 
-export function addUserInput(game: GameEntity, note: string): GameEntity {
+export function addUserInput (game: GameEntity, note: string): GameEntity {
   return {
     ...game,
     userInput: [...game.userInput, note],
-  };
+  }
 }
 
-export function setMatchedIndices(game: GameEntity, indices: number[]): GameEntity {
+export function setMatchedIndices (game: GameEntity, indices: number[]): GameEntity {
   return {
     ...game,
     matchedIndices: indices,
-  };
+  }
 }
 
-export function setFeedback(game: GameEntity, feedback: string | null): GameEntity {
+export function setFeedback (game: GameEntity, feedback: string | null): GameEntity {
   return {
     ...game,
     feedback,
-  };
+  }
 }
 
-export function setDetectedPitch(game: GameEntity, pitch: number | null): GameEntity {
+export function setDetectedPitch (game: GameEntity, pitch: number | null): GameEntity {
   return {
     ...game,
     detectedPitch: pitch,
-  };
+  }
 }
 
-export function setDetectedNote(game: GameEntity, note: string | null): GameEntity {
+export function setDetectedNote (game: GameEntity, note: string | null): GameEntity {
   return {
     ...game,
     detectedNote: note,
-  };
+  }
 }
 
-export function resetGameInput(game: GameEntity): GameEntity {
+export function resetGameInput (game: GameEntity): GameEntity {
   return {
     ...game,
     userInput: [],
@@ -100,5 +100,5 @@ export function resetGameInput(game: GameEntity): GameEntity {
     detectedPitch: null,
     detectedNote: null,
     attemptsLeft: 3,
-  };
-} 
+  }
+}

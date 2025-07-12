@@ -4,7 +4,7 @@ import { useEffect } from 'react'
  * RoosterIcon renders a pixel-art rooster (cock) based on the provided image.
  * If jumping is true, the rooster jumps in Mario style.
  */
-export function RoosterIcon({ width = 64, height = 64, jumping = false }: { width?: number; height?: number; jumping?: boolean }) {
+export function RoosterIcon ({ width = 64, height = 64, jumping = false }: { width?: number; height?: number; jumping?: boolean }) {
   useEffect(() => {
     if (typeof document !== 'undefined' && !document.getElementById('rooster-jump-keyframes')) {
       const style = document.createElement('style')
@@ -20,7 +20,7 @@ export function RoosterIcon({ width = 64, height = 64, jumping = false }: { widt
         70% { transform: translateY(-8px); }
         80% { transform: translateY(0); }
         100% { transform: translateY(0); }
-      }`;
+      }`
       document.head.appendChild(style)
     }
   }, [])
@@ -83,4 +83,4 @@ export function RoosterIcon({ width = 64, height = 64, jumping = false }: { widt
       <rect x="9" y="18" width="2" height="1" fill="#f4a259" />
     </svg>
   )
-} 
+}

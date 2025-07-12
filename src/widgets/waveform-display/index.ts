@@ -1,1 +1,1 @@
-export { WaveformDisplay } from './ui/WaveformDisplay'; 
+export { WaveformDisplay } from './ui/WaveformDisplay'
