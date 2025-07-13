@@ -1,0 +1,23 @@
+	1.	Always start with a test
+Write a failing test before writing any implementation code.
+	2.	No test, no code
+Don’t write production code unless there’s a test driving it.
+	3.	Test names must be clear and behavioral
+Use a format like: shouldDoXWhenY. Example: shouldThrowErrorWhenInputIsInvalid.
+	4.	Make sure the test fails first
+A test that passes immediately is either wrong or the code already exists.
+	5.	Write the minimal code to make the test pass
+No overengineering. No premature abstractions. Just enough to make it green.
+	6.	Colocate tests with implementation
+Tests should live next to the code they cover — same folder, same feature slice (FSD structure).
+	7.	Test quality over code coverage
+High coverage is useless if your tests don’t assert real behavior. Cover edge cases, not just happy paths.
+	8.	One commit per TDD cycle
+Red → Green → (optional) Refactor = one atomic commit. No mixing stages.
+	9.	Reject PRs without tests
+Any feature or bugfix without meaningful tests is incomplete by default.
+	10.	Tests are documentation
+Future devs (including you) will understand behavior by reading tests. Write them like you mean it.
+Any feature or bugfix without meaningful tests is incomplete by default.
+	10.	Tests are documentation
+Future devs (including you) will understand behavior by reading tests. Write them like you mean it.

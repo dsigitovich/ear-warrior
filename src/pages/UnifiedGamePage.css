@@ -436,3 +436,26 @@
     transform: translateY(0);
   }
 }
+
+.fullscreen-back-button {
+  position: fixed;
+  top: 32px;
+  left: 32px;
+  z-index: 200;
+  background: rgba(58, 28, 113, 0.95);
+  color: #ffe066;
+  border: 2px solid #ffe066;
+  border-radius: 8px;
+  font-family: 'Press Start 2P', Arial, sans-serif;
+  font-size: 1.1rem;
+  padding: 12px 28px;
+  cursor: pointer;
+  box-shadow: 0 2px 12px #3a1c71;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.fullscreen-back-button:hover, .fullscreen-back-button:focus {
+  background: #ffe066;
+  color: #3a1c71;
+  border-color: #ff9800;
+  outline: none;
+}

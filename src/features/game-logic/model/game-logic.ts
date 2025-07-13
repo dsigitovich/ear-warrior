@@ -1,5 +1,5 @@
 import { GAME_CONFIG } from '../../../shared/config/constants'
-import { MelodyEntity, getMelodyNotes } from '../../../entities/melody/model/melody'
+import { Melody, getMelodyNotes } from '../../../entities/melody/model/melody'
 
 export interface GameLogicResult {
   isCorrect: boolean;
@@ -11,7 +11,7 @@ export interface GameLogicResult {
 
 export function checkMelodyMatch (
   userInput: string[],
-  melody: MelodyEntity,
+  melody: Melody,
   currentScore: number,
   currentStreak: number
 ): GameLogicResult {

@@ -1,16 +1,15 @@
-import { Note, Difficulty } from '../../../shared/types'
+import { Difficulty } from '../../../shared/types'
 import { NOTES, INTERVALS, DIFFICULTY_LEVELS } from '../../../shared/config/constants'
-import { getNoteFromIndex } from '../../../shared/lib/note-utils'
 
-export function generateMelodyWithIntervals (difficulty: Difficulty): Note[] {
+export function generateMelodyWithIntervals (difficulty: Difficulty): string[] {
   const level = DIFFICULTY_LEVELS.find(l => l.value === difficulty) || DIFFICULTY_LEVELS[1]
   const notesCount = level.notes
 
-  const melody: Note[] = []
+  const melody: string[] = []
   let currentNoteIndex = Math.floor(Math.random() * NOTES.length)
 
   for (let i = 0; i < notesCount; i++) {
-    melody.push(getNoteFromIndex(currentNoteIndex))
+    melody.push(NOTES[currentNoteIndex])
 
     if (i < notesCount - 1) {
       // Choose a random interval for the next note
@@ -34,8 +33,8 @@ export function generateMelodyWithIntervals (difficulty: Difficulty): Note[] {
   return melody
 }
 
-export function generateRandomMelody (length: number = 5): Note[] {
-  const melody: Note[] = []
+export function generateRandomMelody (length: number = 5): string[] {
+  const melody: string[] = []
   for (let i = 0; i < length; i++) {
     melody.push(NOTES[Math.floor(Math.random() * NOTES.length)])
   }

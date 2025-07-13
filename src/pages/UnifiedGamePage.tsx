@@ -49,8 +49,16 @@ export function UnifiedGamePage () {
   return (
     <div className="unified-game-page">
       {/* График и логотип на всю ширину экрана */}
-      {isPlaying && (
+      {(isPlaying || game.state !== 'idle') && (
         <>
+          <button
+            className="fullscreen-back-button"
+            aria-label="Back"
+            onClick={handleStop}
+            type="button"
+          >
+            ← Back
+          </button>
           <div className="fullscreen-header">
             <RoosterIcon width={64} height={48} jumping={game.state === 'playing'} />
             <h1 className="fullscreen-title">Ear Warrior</h1>

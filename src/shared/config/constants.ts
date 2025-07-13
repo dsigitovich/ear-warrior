@@ -1,10 +1,7 @@
-import { Note, Interval, DifficultyLevel } from '../types'
+import { Interval, DifficultyLevel } from '../types'
 
-export const NOTES: Note[] = [
-  'E3', 'F3', 'F#3', 'G3', 'G#3', 'A3', 'A#3', 'B3',
-  'C4', 'C#4', 'D4', 'D#4', 'E4', 'F4', 'F#4', 'G4', 'G#4', 'A4', 'A#4', 'B4',
-  'C5', 'C#5', 'D5', 'D#5', 'E5', 'F5', 'F#5', 'G5', 'G#5', 'A5', 'A#5', 'B5',
-  'C6'
+export const NOTES: string[] = [
+  'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'
 ]
 
 export const INTERVALS: Interval[] = [
@@ -36,14 +33,14 @@ export const AUDIO_CONFIG = {
   MAX_FREQUENCY: 1000,
   MIN_CORRELATION: 0.7,
   MIN_RMS: 0.01,
-  NOTE_DURATION: '8n',
-  NOTE_INTERVAL: 0.8,
+  NOTE_DURATION: '0.5n',
+  NOTE_INTERVAL: 0.6,
   RECORDING_DURATION: 1000, // 1 second in milliseconds
 } as const
 
 export const GAME_CONFIG = {
   SUCCESS_SCORE_MULTIPLIER: 10,
-  FEEDBACK_DURATION: 1000,
-  SUCCESS_DELAY: 1200,
-  ERROR_FEEDBACK_DURATION: 700,
+  FEEDBACK_DURATION: 2000,
+  SUCCESS_DELAY: 1000,
+  ERROR_FEEDBACK_DURATION: 1500,
 } as const
