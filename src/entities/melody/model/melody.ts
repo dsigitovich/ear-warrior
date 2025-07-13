@@ -56,3 +56,17 @@ export class Melody {
     return true
   }
 }
+
+export function getMelodyNotes (melody: Melody): string[] {
+  return melody.getNoteNames()
+}
+
+export function createMelody (notes: string[]): Melody {
+  // Convert string notes to Note objects
+  const noteObjects = notes.map(noteName => {
+    // Simple conversion - you might want to add proper frequency calculation
+    const frequency = 440 // Default frequency
+    return new Note(noteName, 4, frequency)
+  })
+  return new Melody(noteObjects)
+}

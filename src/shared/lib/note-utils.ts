@@ -87,3 +87,12 @@ export function isValidFrequency (frequency: number): boolean {
 export function isValidMidiNote (midiNote: number): boolean {
   return midiNote >= 0 && midiNote <= 127
 }
+
+export function findClosestNote (frequency: number): string | null {
+  if (!isValidFrequency(frequency)) {
+    return null
+  }
+
+  const result = getNoteFromFrequency(frequency)
+  return result.note
+}

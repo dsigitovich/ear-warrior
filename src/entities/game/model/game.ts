@@ -1,5 +1,21 @@
 import { Melody } from '../../melody/model/melody'
 import { Note } from '../../note/model/note'
+import { Difficulty } from '../../../shared/types'
+
+export interface GameEntity {
+  difficulty: Difficulty
+  state: 'idle' | 'playing' | 'listening'
+  currentMelody: Melody | null
+  userInput: string[]
+  matchedIndices: number[]
+  detectedNote: string | null
+  feedback: string | null
+  attemptsLeft: number
+  stats: {
+    score: number
+    streak: number
+  }
+}
 
 export class Game {
   public currentNoteIndex: number = 0
@@ -84,6 +100,61 @@ export class Game {
   }
 }
 
-export function createGame (melody: Melody) {
-  return new Game(melody)
+export function createGame (difficulty: Difficulty): GameEntity {
+  return {
+    difficulty,
+    state: 'idle',
+    currentMelody: null,
+    userInput: [],
+    matchedIndices: [],
+    detectedNote: null,
+    feedback: null,
+    attemptsLeft: 3,
+    stats: {
+      score: 0,
+      streak: 0
+    }
+  }
+}
+
+export function setGameState (game: GameEntity, state: GameEntity['state']): GameEntity {
+  return { ...game, state }
+}
+
+export function setCurrentMelody (game: GameEntity, melody: Melody): GameEntity {
+  return { ...game, currentMelody: melody }
+}
+
+export function addUserInput (game: GameEntity, note: string): GameEntity {
+  return { ...game, userInput: [...game.userInput, note] }
+}
+
+export function setMatchedIndices (game: GameEntity, indices: number[]): GameEntity {
+  return { ...game, matchedIndices: indices }
+}
+
+export function setFeedback (game: GameEntity, feedback: string | null): GameEntity {
+  return { ...game, feedback }
+}
+
+export function setDetectedPitch (game: GameEntity): GameEntity {
+  return { ...game }
+}
+
+export function setDetectedNote (game: GameEntity, note: string | null): GameEntity {
+  return { ...game, detectedNote: note }
+}
+
+export function resetGameInput (game: GameEntity): GameEntity {
+  return { ...game, userInput: [], matchedIndices: [], detectedNote: null }
+}
+
+export function updateGameStats (game: GameEntity, score: number, streak: number): GameEntity {
+  return {
+    ...game,
+    stats: {
+      score: game.stats.score + score,
+      streak
+    }
+  }
 }
