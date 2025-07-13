@@ -69,7 +69,7 @@ export function useGameSession () {
           let attempts = prev.attemptsLeft
           const result = checkMelodyMatch(
             newGame.userInput,
-            gameMelodyRef.current || null,
+            gameMelodyRef.current,
             newGame.stats.score,
             newGame.stats.streak
           )

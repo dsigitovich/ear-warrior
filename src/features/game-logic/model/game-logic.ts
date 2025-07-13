@@ -11,10 +11,19 @@ export interface GameLogicResult {
 
 export function checkMelodyMatch (
   userInput: string[],
-  melody: Melody,
+  melody: Melody | null,
   currentScore: number,
   currentStreak: number
 ): GameLogicResult {
+  if (!melody) {
+    return {
+      isCorrect: false,
+      matchedIndices: [],
+      shouldContinue: false,
+      score: currentScore,
+      streak: 0,
+    }
+  }
   const melodyNotes = getMelodyNotes(melody)
   const isCorrectSoFar = userInput.every((note, index) => note === melodyNotes[index])
 

@@ -20,11 +20,7 @@ export const WaveformDisplay: React.FC<WaveformDisplayProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
-  useEffect(() => {
-    drawWaveform()
-  }, [buffer, pitch, detectedNote, matchedIndices, melodyLength])
-
-  const drawWaveform = () => {
+  const drawWaveform = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
 
@@ -87,7 +83,11 @@ export const WaveformDisplay: React.FC<WaveformDisplayProps> = ({
         ctx.fillText(`${idx + 1}`, x, 26)
       })
     }
-  }
+  }, [buffer, pitch, detectedNote, matchedIndices, melodyLength, sampleRate])
+
+  useEffect(() => {
+    drawWaveform()
+  }, [drawWaveform])
 
   return (
     <div className="waveform-container">
