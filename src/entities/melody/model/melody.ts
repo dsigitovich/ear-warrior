@@ -1,26 +1,58 @@
-import { Note } from '../../../shared/types'
-import { NoteEntity, createNoteWithIndex } from '../../note/model/note'
+import { Note } from '../../note/model/note'
 
-export interface MelodyEntity {
-  notes: NoteEntity[];
-  length: number;
-  difficulty: string;
-}
+export class Melody {
+  constructor (public notes: Note[]) {}
 
-export function createMelody (notes: Note[], difficulty: string): MelodyEntity {
-  const noteEntities = notes.map((note, index) => createNoteWithIndex(note, index))
-
-  return {
-    notes: noteEntities,
-    length: notes.length,
-    difficulty,
+  get length (): number {
+    return this.notes.length
   }
-}
 
-export function getMelodyNotes (melody: MelodyEntity): Note[] {
-  return melody.notes.map(note => note.value)
-}
+  getNoteAt (index: number): Note | undefined {
+    return this.notes[index]
+  }
 
-export function getMelodyLength (melody: MelodyEntity): number {
-  return melody.length
+  addNote (note: Note): void {
+    this.notes.push(note)
+  }
+
+  removeNoteAt (index: number): void {
+    if (index >= 0 && index < this.notes.length) {
+      this.notes.splice(index, 1)
+    }
+  }
+
+  clear (): void {
+    this.notes = []
+  }
+
+  getFrequencyAt (index: number): number | undefined {
+    const note = this.getNoteAt(index)
+    return note?.frequency
+  }
+
+  getNoteNames (): string[] {
+    return this.notes.map(note => note.name)
+  }
+
+  getFrequencies (): number[] {
+    return this.notes.map(note => note.frequency)
+  }
+
+  clone (): Melody {
+    return new Melody([...this.notes])
+  }
+
+  equals (other: Melody): boolean {
+    if (this.length !== other.length) {
+      return false
+    }
+
+    for (let i = 0; i < this.length; i++) {
+      if (!this.notes[i].equals(other.notes[i])) {
+        return false
+      }
+    }
+
+    return true
+  }
 }
