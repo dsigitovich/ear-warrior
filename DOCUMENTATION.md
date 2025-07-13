@@ -1,50 +1,50 @@
-# 🎵 Ear Warrior - Документация проекта
+# 🎵 Ear Warrior - Project Documentation
 
-## 📋 Обзор проекта
+## 📋 Project Overview
 
-**Ear Warrior** - это интерактивная веб-игра для тренировки музыкального слуха, которая помогает пользователям развивать навыки распознавания высоты тона и мелодической памяти через игровую механику в реальном времени.
+**Ear Warrior** is an interactive web-based musical ear training game that helps users develop pitch recognition and melodic memory skills through real-time audio feedback and gamified learning experiences.
 
-## 🎯 Основные функции
+## 🎯 Core Features
 
-- **Генерация мелодий** - Создание мелодий различной сложности (1-8 нот)
-- **Детекция высоты тона** - Анализ пения пользователя через микрофон
-- **Система очков** - Награды за правильные ответы и серии
-- **Прогрессивная сложность** - 4 уровня сложности от начинающего до продвинутого
-- **Визуальная обратная связь** - Анимированный интерфейс с персонажем-петухом
+- **Melody Generation** - Creates melodies of varying complexity (1-8 notes)
+- **Pitch Detection** - Analyzes user's singing through microphone
+- **Scoring System** - Rewards for correct answers and streaks
+- **Progressive Difficulty** - 4 difficulty levels from beginner to advanced
+- **Visual Feedback** - Animated interface with rooster character
 
-## 🏗️ Архитектура проекта
+## 🏗️ Project Architecture
 
-Проект использует **Feature Slice Design** архитектуру:
+The project uses **Feature Slice Design** architecture:
 
 ```
 📁 src/
-├── 🎮 entities/          # Базовые сущности
-│   ├── game/            # Игровая логика
-│   ├── melody/          # Модель мелодии
-│   └── note/            # Модель ноты
-├── ⚡ features/          # Бизнес-логика
-│   ├── game-logic/      # Логика игры
-│   ├── melody-generation/  # Генерация мелодий
-│   └── pitch-detection/    # Детекция высоты тона
-├── 🧩 widgets/          # Составные компоненты
-│   ├── game-panel/      # Панель управления
-│   ├── platform-game/   # Игровая платформа
-│   ├── score-panel/     # Панель счета
-│   └── waveform-display/   # Отображение волны
-├── 📄 pages/            # Страницы
-│   └── UnifiedGamePage/  # Главная игровая страница
-├── 🔄 processes/        # Бизнес-процессы
-│   └── game-session/    # Управление игровой сессией
-└── 🔧 shared/           # Общие компоненты
+├── 🎮 entities/          # Base entities
+│   ├── game/            # Game logic
+│   ├── melody/          # Melody model
+│   └── note/            # Note model
+├── ⚡ features/          # Business logic
+│   ├── game-logic/      # Game logic
+│   ├── melody-generation/  # Melody generation
+│   └── pitch-detection/    # Pitch detection
+├── 🧩 widgets/          # Composite components
+│   ├── game-panel/      # Control panel
+│   ├── platform-game/   # Game platform
+│   ├── score-panel/     # Score panel
+│   └── waveform-display/   # Wave display
+├── 📄 pages/            # Pages
+│   └── UnifiedGamePage/  # Main game page
+├── 🔄 processes/        # Business processes
+│   └── game-session/    # Game session management
+└── 🔧 shared/           # Shared components
     ├── api/             # API
-    ├── config/          # Конфигурация
-    ├── lib/             # Утилиты
-    ├── store/           # Хранилище состояния
-    ├── types/           # Типы TypeScript
-    └── ui/              # UI компоненты
+    ├── config/          # Configuration
+    ├── lib/             # Utilities
+    ├── store/           # State storage
+    ├── types/           # TypeScript types
+    └── ui/              # UI components
 ```
 
-## 🔧 Технологический стек
+## 🔧 Technology Stack
 
 ```mermaid
 graph TB
@@ -52,27 +52,27 @@ graph TB
     A --> C[Vite]
     A --> D[Zustand]
     
-    E[Tone.js] --> F[Аудио синтез]
-    G[Pitchy] --> H[Детекция высоты тона]
+    E[Tone.js] --> F[Audio Synthesis]
+    G[Pitchy] --> H[Pitch Detection]
     
-    I[SCSS] --> J[Стилизация]
-    K[Jest] --> L[Тестирование]
+    I[SCSS] --> J[Styling]
+    K[Jest] --> L[Testing]
     
-    subgraph "Основные технологии"
+    subgraph "Core Technologies"
         A
         B
         C
         D
     end
     
-    subgraph "Аудио обработка"
+    subgraph "Audio Processing"
         E
         F
         G
         H
     end
     
-    subgraph "Разработка"
+    subgraph "Development"
         I
         J
         K
@@ -80,62 +80,62 @@ graph TB
     end
 ```
 
-## 🎮 Игровой процесс
+## 🎮 Gameplay
 
-### Диаграмма состояний игры
+### Game State Diagram
 
 ```mermaid
 stateDiagram-v2
     [*] --> Idle
-    Idle --> Playing: Нажатие "Play Melody"
-    Playing --> Listening: Мелодия проиграна
-    Listening --> Processing: Детектирован звук
-    Processing --> Listening: Правильная нота (продолжение)
-    Processing --> Success: Мелодия завершена
-    Processing --> Retry: Неправильная нота
-    Retry --> Listening: Попытка осталась
-    Retry --> GameOver: Попытки закончились
-    Success --> Idle: Новая игра
-    GameOver --> Idle: Новая игра
+    Idle --> Playing: Press "Play Melody"
+    Playing --> Listening: Melody played
+    Listening --> Processing: Sound detected
+    Processing --> Listening: Correct note (continue)
+    Processing --> Success: Melody completed
+    Processing --> Retry: Wrong note
+    Retry --> Listening: Attempts left
+    Retry --> GameOver: No attempts left
+    Success --> Idle: New game
+    GameOver --> Idle: New game
 ```
 
-### Алгоритм работы
+### Workflow Algorithm
 
 ```mermaid
 flowchart TD
-    A[Начало игры] --> B[Выбор сложности]
-    B --> C[Генерация мелодии]
-    C --> D[Проигрывание мелодии]
-    D --> E[Начало записи]
-    E --> F[Детекция высоты тона]
-    F --> G{Нота распознана?}
-    G -->|Да| H[Сравнение с эталоном]
-    G -->|Нет| F
-    H --> I{Нота правильная?}
-    I -->|Да| J[Добавление очков]
-    I -->|Нет| K[Уменьшение попыток]
-    J --> L{Мелодия завершена?}
-    L -->|Да| M[Успех!]
-    L -->|Нет| E
-    K --> N{Попытки остались?}
-    N -->|Да| O[Повтор мелодии]
-    N -->|Нет| P[Конец игры]
+    A[Game Start] --> B[Select Difficulty]
+    B --> C[Generate Melody]
+    C --> D[Play Melody]
+    D --> E[Start Recording]
+    E --> F[Pitch Detection]
+    F --> G{Note Recognized?}
+    G -->|Yes| H[Compare with Reference]
+    G -->|No| F
+    H --> I{Note Correct?}
+    I -->|Yes| J[Add Score]
+    I -->|No| K[Decrease Attempts]
+    J --> L{Melody Complete?}
+    L -->|Yes| M[Success!]
+    L -->|No| E
+    K --> N{Attempts Left?}
+    N -->|Yes| O[Replay Melody]
+    N -->|No| P[Game Over]
     O --> E
-    M --> Q[Новая игра]
+    M --> Q[New Game]
     P --> Q
     Q --> B
 ```
 
-## 🎵 Система сложности
+## 🎵 Difficulty System
 
-| Уровень | Количество нот | Интервалы | Особенности |
-|---------|---------------|-----------|-------------|
-| **Elementary** | 1 | Унисон | Одна нота для начинающих |
-| **Easy** | 3 | Простые (2-4 полутона) | Основные интервалы |
-| **Medium** | 5 | Средние (5-7 полутонов) | Сложные интервалы |
-| **Hard** | 8 | Все (0-12 полутонов) | Полный диапазон |
+| Level | Note Count | Intervals | Features |
+|-------|-----------|-----------|----------|
+| **Elementary** | 1 | Unison | Single note for beginners |
+| **Easy** | 3 | Simple (2-4 semitones) | Basic intervals |
+| **Medium** | 5 | Moderate (5-7 semitones) | Complex intervals |
+| **Hard** | 8 | All (0-12 semitones) | Full range |
 
-## 🎼 Музыкальные интервалы
+## 🎼 Musical Intervals
 
 ```mermaid
 graph LR
@@ -152,15 +152,15 @@ graph LR
     K --> L[Octave - 12]
 ```
 
-## 🔄 Поток данных
+## 🔄 Data Flow
 
 ```mermaid
 graph TB
-    A[Пользователь] --> B[UnifiedGamePage]
+    A[User] --> B[UnifiedGamePage]
     B --> C[useGameSession]
     C --> D[GameEntity]
     
-    E[Микрофон] --> F[AudioContext]
+    E[Microphone] --> F[AudioContext]
     F --> G[Pitch Detection]
     G --> H[Note Recognition]
     
@@ -170,18 +170,18 @@ graph TB
     C --> L[Zustand Store]
     L --> M[UI Components]
     
-    subgraph "Пользовательский интерфейс"
+    subgraph "User Interface"
         B
         M
     end
     
-    subgraph "Игровая логика"
+    subgraph "Game Logic"
         C
         D
         L
     end
     
-    subgraph "Аудио обработка"
+    subgraph "Audio Processing"
         E
         F
         G
@@ -192,45 +192,45 @@ graph TB
     end
 ```
 
-## 📊 Система очков
+## 📊 Scoring System
 
 ```mermaid
 graph TB
-    A[Правильная нота] --> B[Базовые очки: 10]
-    B --> C[Проверка серии]
-    C --> D{Серия > 1?}
-    D -->|Да| E[Множитель серии]
-    D -->|Нет| F[Обычные очки]
-    E --> G[Очки × серия]
-    G --> H[Обновление счета]
+    A[Correct Note] --> B[Base Score: 10]
+    B --> C[Check Streak]
+    C --> D{Streak > 1?}
+    D -->|Yes| E[Streak Multiplier]
+    D -->|No| F[Regular Score]
+    E --> G[Score × Streak]
+    G --> H[Update Score]
     F --> H
     
-    I[Неправильная нота] --> J[Серия = 0]
-    J --> K[Попытки - 1]
-    K --> L{Попытки = 0?}
-    L -->|Да| M[Конец игры]
-    L -->|Нет| N[Повтор мелодии]
+    I[Wrong Note] --> J[Streak = 0]
+    J --> K[Attempts - 1]
+    K --> L{Attempts = 0?}
+    L -->|Yes| M[Game Over]
+    L -->|No| N[Replay Melody]
 ```
 
-## 🧪 Тестирование
+## 🧪 Testing
 
-Проект включает unit-тесты для основных компонентов:
+The project includes unit tests for core components:
 
-- **Entities**: Тесты игровых сущностей
-- **Features**: Тесты бизнес-логики
-- **Shared**: Тесты утилит и библиотек
+- **Entities**: Tests for game entities
+- **Features**: Tests for business logic
+- **Shared**: Tests for utilities and libraries
 
 ```bash
-# Запуск тестов
+# Run tests
 npm run test
 
-# Запуск тестов с наблюдением
+# Run tests with watch mode
 npm run test:watch
 ```
 
-## 🎨 UI компоненты
+## 🎨 UI Components
 
-### Основные виджеты
+### Main Widgets
 
 ```mermaid
 graph TB
@@ -253,100 +253,100 @@ graph TB
     E --> N[Pitch Visualization]
 ```
 
-## 🚀 Запуск проекта
+## 🚀 Getting Started
 
 ```bash
-# Установка зависимостей
+# Install dependencies
 npm install
 
-# Запуск в режиме разработки
+# Run in development mode
 npm run dev
 
-# Сборка для продакшена
+# Build for production
 npm run build
 
-# Предварительный просмотр сборки
+# Preview build
 npm run preview
 
-# Деплой на GitHub Pages
+# Deploy to GitHub Pages
 npm run deploy
 ```
 
-## 📱 Адаптивность
+## 📱 Responsiveness
 
-Проект поддерживает различные размеры экранов:
+The project supports various screen sizes:
 
-- **Desktop**: Полноэкранный режим игры
-- **Tablet**: Адаптированный интерфейс
-- **Mobile**: Мобильная версия (в разработке)
+- **Desktop**: Full-screen game mode
+- **Tablet**: Adapted interface
+- **Mobile**: Mobile version (in development)
 
-## 🔧 Конфигурация
+## 🔧 Configuration
 
-### Аудио настройки
+### Audio Settings
 
 ```typescript
 export const AUDIO_CONFIG = {
-  SAMPLE_RATE: 44100,        // Частота дискретизации
-  BUFFER_SIZE: 2048,         // Размер буфера
-  MIN_FREQUENCY: 80,         // Минимальная частота
-  MAX_FREQUENCY: 1000,       // Максимальная частота
-  MIN_CORRELATION: 0.7,      // Минимальная корреляция
-  MIN_RMS: 0.01,            // Минимальный RMS
-  NOTE_DURATION: '0.5n',     // Длительность ноты
-  NOTE_INTERVAL: 0.6,        // Интервал между нотами
-  RECORDING_DURATION: 1000,  // Длительность записи (мс)
+  SAMPLE_RATE: 44100,        // Sample rate
+  BUFFER_SIZE: 2048,         // Buffer size
+  MIN_FREQUENCY: 80,         // Minimum frequency
+  MAX_FREQUENCY: 1000,       // Maximum frequency
+  MIN_CORRELATION: 0.7,      // Minimum correlation
+  MIN_RMS: 0.01,            // Minimum RMS
+  NOTE_DURATION: '0.5n',     // Note duration
+  NOTE_INTERVAL: 0.6,        // Interval between notes
+  RECORDING_DURATION: 1000,  // Recording duration (ms)
 }
 ```
 
-### Игровые настройки
+### Game Settings
 
 ```typescript
 export const GAME_CONFIG = {
-  SUCCESS_SCORE_MULTIPLIER: 10,  // Множитель очков за успех
-  FEEDBACK_DURATION: 2000,       // Длительность обратной связи
-  SUCCESS_DELAY: 1000,           // Задержка после успеха
-  ERROR_FEEDBACK_DURATION: 1500, // Длительность ошибки
+  SUCCESS_SCORE_MULTIPLIER: 10,  // Score multiplier for success
+  FEEDBACK_DURATION: 2000,       // Feedback duration
+  SUCCESS_DELAY: 1000,           // Delay after success
+  ERROR_FEEDBACK_DURATION: 1500, // Error feedback duration
 }
 ```
 
-## 🎯 Планы развития
+## 🎯 Development Roadmap
 
-### Фаза 1: Основные улучшения
-- [ ] Улучшение точности детекции звука
-- [ ] Добавление новых уровней сложности
-- [ ] Система учетных записей
-- [ ] Мобильное приложение
+### Phase 1: Core Improvements
+- [ ] Improve audio detection accuracy
+- [ ] Add new difficulty levels
+- [ ] User accounts system
+- [ ] Mobile application
 
-### Фаза 2: Расширенные функции
-- [ ] Тренировка интервалов
-- [ ] Распознавание аккордов
-- [ ] Социальные функции
-- [ ] Система достижений
+### Phase 2: Advanced Features
+- [ ] Interval training
+- [ ] Chord recognition
+- [ ] Social features
+- [ ] Achievement system
 
-### Фаза 3: Образовательная платформа
-- [ ] Интеграция музыкальной теории
-- [ ] Система видеоуроков
-- [ ] Панель для преподавателей
-- [ ] Расширенная аналитика
+### Phase 3: Educational Platform
+- [ ] Music theory integration
+- [ ] Video tutorial system
+- [ ] Teacher dashboard
+- [ ] Advanced analytics
 
-## 🤝 Вклад в проект
+## 🤝 Contributing
 
-1. Форкните репозиторий
-2. Создайте ветку для функции (`git checkout -b feature/AmazingFeature`)
-3. Зафиксируйте изменения (`git commit -m 'Add some AmazingFeature'`)
-4. Отправьте в ветку (`git push origin feature/AmazingFeature`)
-5. Откройте Pull Request
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## 📄 Лицензия
+## 📄 License
 
-Этот проект лицензирован под MIT License - см. файл [LICENSE](LICENSE) для деталей.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🎵 Авторы
+## 🎵 Authors
 
-- **Основная разработка**: Команда Ear Warrior
-- **Музыкальная консультация**: Профессиональные музыканты
-- **UX/UI дизайн**: Команда дизайна
+- **Core Development**: Ear Warrior Team
+- **Music Consultation**: Professional Musicians
+- **UX/UI Design**: Design Team
 
 ---
 
-*Документация обновлена: декабрь 2024*
+*Documentation updated: December 2024*
