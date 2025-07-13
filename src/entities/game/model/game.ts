@@ -9,6 +9,7 @@ export interface GameEntity {
   userInput: string[]
   matchedIndices: number[]
   detectedNote: string | null
+  detectedPitch: number | null
   feedback: string | null
   attemptsLeft: number
   stats: {
@@ -108,6 +109,7 @@ export function createGame (difficulty: Difficulty): GameEntity {
     userInput: [],
     matchedIndices: [],
     detectedNote: null,
+    detectedPitch: null,
     feedback: null,
     attemptsLeft: 3,
     stats: {
@@ -121,7 +123,7 @@ export function setGameState (game: GameEntity, state: GameEntity['state']): Gam
   return { ...game, state }
 }
 
-export function setCurrentMelody (game: GameEntity, melody: Melody): GameEntity {
+export function setCurrentMelody (game: GameEntity, melody: Melody | null): GameEntity {
   return { ...game, currentMelody: melody }
 }
 
@@ -137,8 +139,8 @@ export function setFeedback (game: GameEntity, feedback: string | null): GameEnt
   return { ...game, feedback }
 }
 
-export function setDetectedPitch (game: GameEntity): GameEntity {
-  return { ...game }
+export function setDetectedPitch (game: GameEntity, pitch: number | null): GameEntity {
+  return { ...game, detectedPitch: pitch }
 }
 
 export function setDetectedNote (game: GameEntity, note: string | null): GameEntity {
@@ -146,7 +148,7 @@ export function setDetectedNote (game: GameEntity, note: string | null): GameEnt
 }
 
 export function resetGameInput (game: GameEntity): GameEntity {
-  return { ...game, userInput: [], matchedIndices: [], detectedNote: null }
+  return { ...game, userInput: [], matchedIndices: [], detectedNote: null, detectedPitch: null }
 }
 
 export function updateGameStats (game: GameEntity, score: number, streak: number): GameEntity {

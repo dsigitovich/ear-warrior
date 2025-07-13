@@ -24,7 +24,7 @@ export class Note {
 
   getMidiNote (): number {
     const noteIndex = NOTES.indexOf(this.name)
-    return noteIndex + (this.octave + 1) * 12
+    return noteIndex + ((this.octave ?? 4) + 1) * 12
   }
 
   static fromMidiNote (midiNote: number): Note {

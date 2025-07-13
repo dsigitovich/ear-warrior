@@ -121,7 +121,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   // Для блокировки прыжка после попадания
   const [isLockedOnPlatform, setIsLockedOnPlatform] = useState(false)
   // Для хранения id таймера прыжка
-  const jumpTimeoutRef = useRef<number | null>(null)
+  const jumpTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Функция для создания плавного прыжка
   const createSmoothJump = (startX: number, startY: number, targetX: number, targetY: number) => {

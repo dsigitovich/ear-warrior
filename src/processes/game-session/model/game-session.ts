@@ -24,7 +24,7 @@ export function useGameSession () {
   // New state for 1-second recording
   const recordingStartTimeRef = useRef<number | null>(null)
   const accumulatedFrequenciesRef = useRef<number[]>([])
-  const recordingTimeoutRef = useRef<number | null>(null)
+  const recordingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Update ref on every render
   gameMelodyRef.current = game.currentMelody
@@ -153,7 +153,7 @@ export function useGameSession () {
     }
 
     const newMelodyNotes = generateMelodyWithIntervals(game.difficulty)
-    const newMelody = createMelody(newMelodyNotes, game.difficulty)
+    const newMelody = createMelody(newMelodyNotes)
 
     setGame(prev => setCurrentMelody(prev, newMelody))
     await Tone.start()
@@ -250,7 +250,7 @@ export function useGameSession () {
     let time = 0
 
     game.currentMelody.notes.forEach((note) => {
-      synth.triggerAttackRelease(note.value, AUDIO_CONFIG.NOTE_DURATION, Tone.now() + time)
+      synth.triggerAttackRelease(note.toString(), AUDIO_CONFIG.NOTE_DURATION, Tone.now() + time)
       time += AUDIO_CONFIG.NOTE_INTERVAL
     })
   }, [game.currentMelody])
