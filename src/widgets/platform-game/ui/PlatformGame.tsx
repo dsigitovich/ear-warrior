@@ -280,7 +280,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         cancelAnimationFrame(animationId)
       }
     }
-  }, [platforms, jumpAnimation, roosterVelocity])
+  }, [platforms, jumpAnimation])
 
   // Отрисовка
   useEffect(() => {

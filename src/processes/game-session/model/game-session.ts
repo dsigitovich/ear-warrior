@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
 import * as Tone from 'tone'
 import { Difficulty } from '../../../shared/types'
-import { AUDIO_CONFIG, GAME_CONFIG } from '../../../shared/config/constants'
+import { AUDIO_CONFIG, GAME_CONFIG, NOTES } from '../../../shared/config/constants'
 import { generateMelodyWithIntervals } from '../../../features/melody-generation/model/melody-generator'
 import { detectPitchFromBuffer, calculateAverageFrequency } from '../../../features/pitch-detection/model/pitch-detector'
 import { checkMelodyMatch } from '../../../features/game-logic/model/game-logic'
@@ -69,7 +69,7 @@ export function useGameSession () {
           let attempts = prev.attemptsLeft
           const result = checkMelodyMatch(
             newGame.userInput,
-            gameMelodyRef.current!,
+            gameMelodyRef.current || null,
             newGame.stats.score,
             newGame.stats.streak
           )
@@ -139,43 +139,13 @@ export function useGameSession () {
   }, [])
 
   const playMelody = useCallback(async () => {
-    setGame(prev => ({ ...setGameState(prev, 'playing'), attemptsLeft: 3 }))
-    setGame(prev => resetGameInput(prev))
-
-    // Отключаем микрофон перед проигрыванием мелодии
-    stopListening()
-
-    if (!audioContextRef.current) {
-      audioContextRef.current = new window.AudioContext()
-    }
-    if (audioContextRef.current.state !== 'running') {
-      await audioContextRef.current.resume()
-    }
-
-    const newMelodyNotes = generateMelodyWithIntervals(game.difficulty)
-    const newMelody = createMelody(newMelodyNotes)
-
-    setGame(prev => setCurrentMelody(prev, newMelody))
-    await Tone.start()
-
-    const synth = new Tone.AMSynth().toDestination()
-    let time = 0
-    newMelodyNotes.forEach((note) => {
-      synth.triggerAttackRelease(note, AUDIO_CONFIG.NOTE_DURATION, Tone.now() + time)
-      time += AUDIO_CONFIG.NOTE_INTERVAL
-    })
-
-    setTimeout(() => {
-      setGame(prev => setGameState(prev, 'listening'))
-      isListeningRef.current = true
-      startListening()
-      startRecordingPeriod()
-    }, newMelodyNotes.length * AUDIO_CONFIG.NOTE_INTERVAL * 1000 + 200)
-  }, [game.difficulty])
-
-  const startListening = useCallback(async () => {
     try {
-      console.log('startListening called')
+      setGame(prev => ({ ...setGameState(prev, 'playing'), attemptsLeft: 3 }))
+      setGame(prev => resetGameInput(prev))
+
+      // Отключаем микрофон перед проигрыванием мелодии
+      stopListening()
+
       if (!audioContextRef.current) {
         audioContextRef.current = new window.AudioContext()
       }
@@ -183,11 +153,56 @@ export function useGameSession () {
         await audioContextRef.current.resume()
       }
 
+      const newMelodyNotes = generateMelodyWithIntervals(game.difficulty)
+      const newMelody = createMelody(newMelodyNotes)
+
+      setGame(prev => setCurrentMelody(prev, newMelody))
+      await Tone.start()
+
+      const synth = new Tone.AMSynth().toDestination()
+      let time = 0
+      newMelody.notes.forEach((note) => {
+        // Convert note to frequency
+        const noteIndex = NOTES.indexOf(note.name)
+        if (noteIndex === -1) {
+          return
+        }
+        // Use MIDI note number instead of frequency
+        const midiNoteNumber = noteIndex + ((note.octave ?? 4) + 1) * 12
+        synth.triggerAttackRelease(midiNoteNumber, AUDIO_CONFIG.NOTE_DURATION, Tone.now() + time)
+        time += AUDIO_CONFIG.NOTE_INTERVAL
+      })
+
+      const delay = newMelodyNotes.length * AUDIO_CONFIG.NOTE_INTERVAL * 1000 + 200
+
+      setTimeout(() => {
+        setGame(prev => setGameState(prev, 'listening'))
+        isListeningRef.current = true
+        startListening()
+        startRecordingPeriod()
+      }, delay)
+    } catch {
+      setGame(prev => setFeedback(prev, 'Error playing melody'))
+    }
+  }, [game.difficulty])
+
+  const startListening = useCallback(async () => {
+    try {
+      if (!audioContextRef.current) {
+        audioContextRef.current = new window.AudioContext()
+      }
+      if (audioContextRef.current.state !== 'running') {
+        await audioContextRef.current.resume()
+      }
+
+      // Check if getUserMedia is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('getUserMedia is not supported in this browser')
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      console.log('got user media stream', stream)
       const source = audioContextRef.current.createMediaStreamSource(stream)
       const processor = audioContextRef.current.createScriptProcessor(AUDIO_CONFIG.BUFFER_SIZE, 1, 1)
-      console.log('created ScriptProcessor', processor)
 
       source.connect(processor)
       processor.connect(audioContextRef.current.destination)
@@ -201,7 +216,7 @@ export function useGameSession () {
         if (recordingStartTimeRef.current) {
           const input = event.inputBuffer.getChannelData(0)
           setAudioBuffer(new Float32Array(input))
-          const pitchResult = detectPitchFromBuffer(input, audioContextRef.current!.sampleRate)
+          const pitchResult = detectPitchFromBuffer(input, audioContextRef.current?.sampleRate || 44100)
 
           // Accumulate valid frequencies
           if (pitchResult.frequency && pitchResult.frequency > 0) {
@@ -218,7 +233,7 @@ export function useGameSession () {
     } catch {
       setGame(prev => setFeedback(prev, 'Microphone error'))
     }
-  }, [game.currentMelody])
+  }, [])
 
   const stopListening = useCallback(() => {
     setGame(prev => setGameState(prev, 'idle'))
@@ -250,7 +265,15 @@ export function useGameSession () {
     let time = 0
 
     game.currentMelody.notes.forEach((note) => {
-      synth.triggerAttackRelease(note.toString(), AUDIO_CONFIG.NOTE_DURATION, Tone.now() + time)
+      // Convert note to frequency
+      const noteIndex = NOTES.indexOf(note.name)
+      if (noteIndex === -1) {
+        return
+      }
+
+      // Use MIDI note number instead of frequency
+      const midiNoteNumber = noteIndex + ((note.octave ?? 4) + 1) * 12
+      synth.triggerAttackRelease(midiNoteNumber, AUDIO_CONFIG.NOTE_DURATION, Tone.now() + time)
       time += AUDIO_CONFIG.NOTE_INTERVAL
     })
   }, [game.currentMelody])

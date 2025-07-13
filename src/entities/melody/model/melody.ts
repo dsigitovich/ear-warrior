@@ -1,4 +1,5 @@
 import { Note } from '../../note/model/note'
+import { NOTES } from '../../../shared/config/constants'
 
 export class Melody {
   constructor (public notes: Note[]) {}
@@ -64,8 +65,13 @@ export function getMelodyNotes (melody: Melody): string[] {
 export function createMelody (notes: string[]): Melody {
   // Convert string notes to Note objects
   const noteObjects = notes.map(noteName => {
-    // Simple conversion - you might want to add proper frequency calculation
-    const frequency = 440 // Default frequency
+    // Calculate proper frequency for each note
+    const noteIndex = NOTES.indexOf(noteName)
+    if (noteIndex === -1) {
+      throw new Error(`Invalid note name: ${noteName}`)
+    }
+    const midiNote = noteIndex + (4 + 1) * 12 // Use octave 4 as default
+    const frequency = 440 * Math.pow(2, (midiNote - 69) / 12)
     return new Note(noteName, 4, frequency)
   })
   return new Melody(noteObjects)

@@ -1,5 +1,5 @@
-import { detectPitch } from '../../../shared/lib/pitch-detection'
 import { findClosestNote } from '../../../shared/lib/note-utils'
+import { detectPitch } from '../../../shared/lib/pitch-detection'
 
 export interface PitchDetectionResult {
   frequency: number | null;

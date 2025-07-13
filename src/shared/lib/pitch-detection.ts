@@ -9,7 +9,9 @@ export function detectPitch (buffer: Float32Array, sampleRate: number): number |
   for (let i = 0; i < windowed.length; i++) rms += windowed[i] * windowed[i]
   rms = Math.sqrt(rms / windowed.length)
 
-  if (rms < AUDIO_CONFIG.MIN_RMS) return null // Too quiet
+  if (rms < AUDIO_CONFIG.MIN_RMS) {
+    return null // Too quiet
+  }
 
   for (let lag = AUDIO_CONFIG.MIN_FREQUENCY; lag < AUDIO_CONFIG.MAX_FREQUENCY; lag++) {
     let corr = 0
@@ -29,7 +31,8 @@ export function detectPitch (buffer: Float32Array, sampleRate: number): number |
   }
 
   if (maxCorr > AUDIO_CONFIG.MIN_CORRELATION && bestLag > AUDIO_CONFIG.MIN_FREQUENCY && bestLag < AUDIO_CONFIG.MAX_FREQUENCY - 1) {
-    return sampleRate / bestLag
+    const frequency = sampleRate / bestLag
+    return frequency
   }
 
   return null
