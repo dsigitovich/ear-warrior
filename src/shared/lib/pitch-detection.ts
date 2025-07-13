@@ -6,7 +6,11 @@ export function detectPitch (buffer: Float32Array, sampleRate: number): number |
   let bestLag = 0
   let rms = 0
 
-  for (let i = 0; i < windowed.length; i++) rms += windowed[i] * windowed[i]
+  for (let i = 0; i < windowed.length; i++) {
+    const v = windowed[i]
+    if (typeof v !== 'number') continue
+    rms += v * v
+  }
   rms = Math.sqrt(rms / windowed.length)
 
   if (rms < AUDIO_CONFIG.MIN_RMS) {
@@ -18,8 +22,11 @@ export function detectPitch (buffer: Float32Array, sampleRate: number): number |
     let norm = 0
 
     for (let i = 0; i < windowed.length - lag; i++) {
-      corr += windowed[i] * windowed[i + lag]
-      norm += windowed[i] * windowed[i] + windowed[i + lag] * windowed[i + lag]
+      const a = windowed[i]
+      const b = windowed[i + lag]
+      if (a === undefined || b === undefined) continue
+      corr += a * b
+      norm += a * a + b * b
     }
 
     if (norm > 0) corr /= Math.sqrt(norm)

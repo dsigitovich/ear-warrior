@@ -319,14 +319,18 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
 
     // Ретро звездное небо с параллаксом
     for (let l = 0; l < STAR_LAYERS; l++) {
-      ctx.fillStyle = STAR_COLORS[l]
+      const color = STAR_COLORS[l]
+      if (!color) continue
+      ctx.fillStyle = color
       for (let i = 0; i < STARS_PER_LAYER; i++) {
-        const star = starField[l][i]
+        const star = starField[l]?.[i]
+        if (!star || typeof star.x !== 'number' || typeof star.y !== 'number') continue
         // Зацикленный параллакс
-        let x = (star.x + starParallax * STAR_SPEEDS[l]) % CANVAS_WIDTH
+        let x = (star.x + starParallax * STAR_SPEEDS[l]!) % CANVAS_WIDTH
         if (x < 0) x += CANVAS_WIDTH
         ctx.beginPath()
-        ctx.arc(x, star.y, STAR_SIZES[l], 0, 2 * Math.PI)
+        const size = STAR_SIZES[l] ?? 1
+        ctx.arc(x, star.y, size, 0, 2 * Math.PI)
         ctx.fill()
       }
     }

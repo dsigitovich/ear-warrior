@@ -11,6 +11,7 @@ export function getNoteFrequency (noteName: string, octave: number): number {
   }
 
   const noteIndex = NOTES.indexOf(noteName)
+  if (noteIndex === -1) throw new Error('Invalid note name for frequency calc')
   const midiNote = noteIndex + (octave + 1) * 12
   return 440 * Math.pow(2, (midiNote - 69) / 12)
 }
@@ -21,8 +22,9 @@ export function getNoteFromFrequency (frequency: number): { note: string; octave
   }
 
   // Find the closest note to the given frequency
-  let closestNote = NOTES[0]
-  let closestOctave = 4
+  if (!NOTES[0]) throw new Error('NOTES array is empty')
+  let closestNote: string = NOTES[0]
+  let closestOctave: number = 4
   let minDifference = Infinity
 
   for (let octave = 0; octave <= 9; octave++) {
@@ -37,6 +39,8 @@ export function getNoteFromFrequency (frequency: number): { note: string; octave
       }
     }
   }
+
+  if (closestNote === undefined) throw new Error('Could not find closest note')
 
   return {
     note: closestNote,
@@ -54,6 +58,7 @@ export function getMidiNoteNumber (noteName: string, octave: number): number {
   }
 
   const noteIndex = NOTES.indexOf(noteName)
+  if (noteIndex === -1) throw new Error('Invalid note name for midi calc')
   return noteIndex + (octave + 1) * 12
 }
 
@@ -65,6 +70,7 @@ export function getNoteFromMidi (midiNote: number): { note: string; octave: numb
   let octave = Math.floor(midiNote / 12) - 1
   const noteIndex = midiNote % 12
   const noteName = NOTES[noteIndex]
+  if (noteName === undefined) throw new Error('Invalid note index for midi')
   if (octave > 9) octave = 9
   // Диагностика
   if (midiNote === 127) {

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useCallback } from 'react'
 import './WaveformDisplay.css'
 
 interface WaveformDisplayProps {
@@ -38,8 +38,10 @@ export const WaveformDisplay: React.FC<WaveformDisplayProps> = ({
       ctx.beginPath()
       ctx.moveTo(0, canvas.height / 2)
       for (let i = 0; i < buffer.length; i++) {
+        const value = buffer[i]
+        if (typeof value !== 'number') continue
         const x = (i / buffer.length) * canvas.width
-        const y = (1 - buffer[i]) * (canvas.height / 2)
+        const y = (1 - value) * (canvas.height / 2)
         ctx.lineTo(x, y)
       }
       ctx.strokeStyle = '#ffe066'

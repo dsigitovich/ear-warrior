@@ -6,7 +6,7 @@ module.exports = {
     '^tone$': '<rootDir>/src/__mocks__/tone.js',
   },
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.test.json' }],
+    '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.json' }],
   },
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{ts,tsx}',

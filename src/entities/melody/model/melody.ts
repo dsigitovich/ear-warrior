@@ -49,7 +49,9 @@ export class Melody {
     }
 
     for (let i = 0; i < this.length; i++) {
-      if (!this.notes[i].equals(other.notes[i])) {
+      const thisNote = this.notes[i]
+      const otherNote = other.notes[i]
+      if (!thisNote || !otherNote || !thisNote.equals(otherNote)) {
         return false
       }
     }
