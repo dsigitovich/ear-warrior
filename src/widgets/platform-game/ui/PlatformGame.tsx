@@ -21,6 +21,17 @@ interface Platform {
   isCurrent: boolean;
 }
 
+interface JumpAnimation {
+  isActive: boolean;
+  startTime: number;
+  duration: number;
+  startX: number;
+  startY: number;
+  targetX: number;
+  targetY: number;
+  peakY: number;
+}
+
 export const PlatformGame: React.FC<PlatformGameProps> = ({
   detectedNote,
   matchedIndices,
@@ -34,6 +45,16 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   const [roosterPosition, setRoosterPosition] = useState({ x: 400, y: 300 })
   const [roosterVelocity, setRoosterVelocity] = useState({ x: 2, y: 0 })
   const [isRoosterJumping, setIsRoosterJumping] = useState(false)
+  const [jumpAnimation, setJumpAnimation] = useState<JumpAnimation>({
+    isActive: false,
+    startTime: 0,
+    duration: 0,
+    startX: 0,
+    startY: 0,
+    targetX: 0,
+    targetY: 0,
+    peakY: 0,
+  })
 
   // Генерируем платформы на основе мелодии
   useEffect(() => {
@@ -102,6 +123,24 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   // Для хранения id таймера прыжка
   const jumpTimeoutRef = useRef<number | null>(null)
 
+  // Функция для создания плавного прыжка
+  const createSmoothJump = (startX: number, startY: number, targetX: number, targetY: number) => {
+    const distance = Math.abs(targetX - startX)
+    const jumpHeight = Math.max(80, distance * 0.3) // Высота прыжка зависит от расстояния
+    const duration = Math.max(800, distance * 2) // Длительность зависит от расстояния
+
+    setJumpAnimation({
+      isActive: true,
+      startTime: Date.now(),
+      duration,
+      startX,
+      startY,
+      targetX,
+      targetY,
+      peakY: Math.min(startY, targetY) - jumpHeight,
+    })
+  }
+
   // Реакция на новый звук пользователя
   useEffect(() => {
     if (!isListening) {
@@ -109,85 +148,127 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
       setIsLockedOnPlatform(false)
       prevDetectedNoteRef.current = null
       if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
+      setJumpAnimation(prev => ({ ...prev, isActive: false }))
       return
     }
+
     if (detectedNote && detectedNote !== prevDetectedNoteRef.current) {
       prevDetectedNoteRef.current = detectedNote
       const currentPlatform = platforms.find((p) => p.isCurrent)
+
       if (currentPlatform && detectedNote === currentPlatform.note) {
-        setIsRoosterJumping(false)
+        // Успешное попадание - плавный прыжок к платформе
+        const targetX = currentPlatform.x + currentPlatform.width / 2
+        const targetY = currentPlatform.y - 60 // Позиция петуха на платформе
+
+        createSmoothJump(roosterPosition.x, roosterPosition.y, targetX, targetY)
+        setIsRoosterJumping(true)
         setIsLockedOnPlatform(true)
+
         if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
+        jumpTimeoutRef.current = setTimeout(() => {
+          setIsRoosterJumping(false)
+          setJumpAnimation(prev => ({ ...prev, isActive: false }))
+        }, jumpAnimation.duration)
+
       } else if (!isLockedOnPlatform) {
-        setIsRoosterJumping(false)
+        // Неправильная нота - небольшой прыжок на месте
+        setIsRoosterJumping(true)
         if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
-        setTimeout(() => setIsRoosterJumping(true), 10)
-        jumpTimeoutRef.current = setTimeout(() => setIsRoosterJumping(false), 220)
+        jumpTimeoutRef.current = setTimeout(() => setIsRoosterJumping(false), 300)
       }
     }
-  }, [detectedNote, isListening, platforms, isLockedOnPlatform])
+  }, [detectedNote, isListening, platforms, isLockedOnPlatform, roosterPosition])
 
   // Сброс блокировки при переходе к следующей платформе
   useEffect(() => {
     setIsLockedOnPlatform(false)
+    setJumpAnimation(prev => ({ ...prev, isActive: false }))
   }, [currentNoteIndex])
 
-  // Анимация петуха
+  // Анимация петуха с плавной траекторией
   useEffect(() => {
     let animationId: number
     const gravity = 0.8
-    const jumpPower = -15
 
     const animate = () => {
       setRoosterPosition(prev => {
-        let newX = prev.x + roosterVelocity.x
-        let newY = prev.y + roosterVelocity.y
+        let newX = prev.x
+        let newY = prev.y
 
-        // Применяем гравитацию
-        setRoosterVelocity(prevVel => ({
-          x: prevVel.x * 0.98,
-          y: prevVel.y + gravity,
-        }))
+        if (jumpAnimation.isActive) {
+          // Плавная анимация прыжка
+          const elapsed = Date.now() - jumpAnimation.startTime
+          const progress = Math.min(elapsed / jumpAnimation.duration, 1)
 
-        // Проверяем столкновения с платформами
-        platforms.forEach((platform) => {
-          if (newX + 40 > platform.x &&
+          // Используем кривую Безье для плавной траектории
+          const t = progress
+          const t2 = t * t
+          const t3 = t2 * t
+          const mt = 1 - t
+          const mt2 = mt * mt
+          const mt3 = mt2 * mt
+
+          // Контрольные точки для кривой Безье
+          const cp1x = jumpAnimation.startX + (jumpAnimation.targetX - jumpAnimation.startX) * 0.25
+          const cp1y = jumpAnimation.peakY
+          const cp2x = jumpAnimation.startX + (jumpAnimation.targetX - jumpAnimation.startX) * 0.75
+          const cp2y = jumpAnimation.peakY
+
+          // Кривая Безье: B(t) = (1-t)³P₀ + 3(1-t)²tP₁ + 3(1-t)t²P₂ + t³P₃
+          newX = mt3 * jumpAnimation.startX +
+                 3 * mt2 * t * cp1x +
+                 3 * mt * t2 * cp2x +
+                 t3 * jumpAnimation.targetX
+
+          newY = mt3 * jumpAnimation.startY +
+                 3 * mt2 * t * cp1y +
+                 3 * mt * t2 * cp2y +
+                 t3 * jumpAnimation.targetY
+
+          // Добавляем небольшое колебание для более естественного движения
+          const wobble = Math.sin(progress * Math.PI * 4) * 2
+          newY += wobble
+
+        } else {
+          // Обычная физика для свободного падения
+          newX = prev.x + roosterVelocity.x
+          newY = prev.y + roosterVelocity.y
+
+          // Применяем гравитацию
+          setRoosterVelocity(prevVel => ({
+            x: prevVel.x * 0.98,
+            y: prevVel.y + gravity,
+          }))
+
+          // Проверяем столкновения с платформами
+          platforms.forEach((platform) => {
+            if (newX + 40 > platform.x &&
               newX < platform.x + platform.width &&
               newY + 60 > platform.y &&
               newY + 60 < platform.y + platform.height + 10) {
 
-            // Петух приземлился на платформу
-            newY = platform.y - 60
-            setRoosterVelocity(prev => ({ ...prev, y: 0 }))
-
-            // Если это текущая нота и она совпадает
-            if (platform.isCurrent && detectedNote && platform.note === detectedNote) {
-              // Успешное попадание
-              setIsRoosterJumping(true)
-              setRoosterVelocity(prev => ({ ...prev, y: jumpPower }))
-              // Сбрасываем прыжок через некоторое время
-              setTimeout(() => setIsRoosterJumping(false), 1200)
+              // Петух приземлился на платформу
+              newY = platform.y - 60
+              setRoosterVelocity(prev => ({ ...prev, y: 0 }))
             }
-          }
-        })
+          })
 
-        // Ограничиваем движение
-        if (newX < 100) newX = 100
-        if (newX > 700) newX = 700
-        if (newY > 450) {
-          newY = 450
-          setRoosterVelocity(prev => ({ ...prev, y: 0 }))
-        }
-        if (newY < 50) {
-          newY = 50
-          setRoosterVelocity(prev => ({ ...prev, y: 0 }))
+          // Ограничиваем движение
+          if (newX < 100) newX = 100
+          if (newX > 700) newX = 700
+          if (newY > 450) {
+            newY = 450
+            setRoosterVelocity(prev => ({ ...prev, y: 0 }))
+          }
+          if (newY < 50) {
+            newY = 50
+            setRoosterVelocity(prev => ({ ...prev, y: 0 }))
+          }
         }
 
         return { x: newX, y: newY }
       })
-
-      // Параллакс эффект для платформ
-      // setParallaxOffset(prev => (prev + 1) % 1000) // Удалено
 
       animationId = requestAnimationFrame(animate)
     }
@@ -199,7 +280,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         cancelAnimationFrame(animationId)
       }
     }
-  }, [platforms, detectedNote, roosterVelocity])
+  }, [platforms, jumpAnimation, roosterVelocity])
 
   // Отрисовка
   useEffect(() => {
