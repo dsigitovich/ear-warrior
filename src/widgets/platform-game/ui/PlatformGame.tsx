@@ -137,6 +137,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
     return layers
   })
   const [starParallax, setStarParallax] = useState(0)
+  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set())
 
   // Анимация параллакса звезд
   useEffect(() => {
@@ -213,7 +214,126 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
     }, 150) // 150ms anticipation
   }, [])
 
-  // Реакция на новый звук пользователя
+  // Универсальная функция для обработки пользовательского ввода
+  // Принимает inputNote и опционально тип источника ввода ('audio' | 'keyboard' | 'click')
+  const handleUserInput = useCallback((inputNote: string) => {
+    if (!isListening) return
+
+    const currentPlatform = platforms.find((p) => p.isCurrent)
+
+    if (currentPlatform && inputNote === currentPlatform.note) {
+      // Успешное попадание - плавный прыжок к платформе
+      const targetX = currentPlatform.x + currentPlatform.width / 2
+      const targetY = currentPlatform.y - 60 // Позиция петуха на платформе
+
+      createSmoothJump(roosterPosition.x, roosterPosition.y, targetX, targetY, true)
+      setIsRoosterJumping(true)
+      setIsLockedOnPlatform(true)
+
+      if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
+      jumpTimeoutRef.current = setTimeout(() => {
+        setIsRoosterJumping(false)
+        setJumpAnimation(prev => ({ ...prev, isActive: false }))
+        // Добавляем эффект приземления
+        setRoosterState(prev => ({
+          ...prev,
+          isLanding: true,
+          landingStartTime: Date.now(),
+        }))
+      }, jumpAnimation.duration + 150) // +150ms для anticipation
+
+    } else if (!isLockedOnPlatform) {
+      // Неправильная нота - небольшой прыжок на месте
+      createSmoothJump(roosterPosition.x, roosterPosition.y, roosterPosition.x + (Math.random() - 0.5) * 40, roosterPosition.y, false)
+      setIsRoosterJumping(true)
+      if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
+      jumpTimeoutRef.current = setTimeout(() => {
+        setIsRoosterJumping(false)
+        setJumpAnimation(prev => ({ ...prev, isActive: false }))
+      }, 600 + 150) // +150ms для anticipation
+    }
+  }, [isListening, platforms, isLockedOnPlatform, roosterPosition, createSmoothJump, jumpAnimation.duration])
+
+  // Обработка клавиатурного ввода
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isListening) return
+
+      const key = event.key
+
+      // Добавляем визуальную обратную связь
+      setPressedKeys(prev => new Set(prev).add(key))
+
+      if (key >= '1' && key <= '8') {
+        const platformIndex = parseInt(key) - 1
+        const targetPlatform = platforms[platformIndex]
+        if (targetPlatform) {
+          handleUserInput(targetPlatform.note)
+        }
+      }
+
+      // Также можем добавить поддержку нот через клавиши
+      const noteKeyMap: { [key: string]: string } = {
+        'c': 'C',
+        'd': 'D',
+        'e': 'E',
+        'f': 'F',
+        'g': 'G',
+        'a': 'A',
+        'b': 'B',
+      }
+
+      const note = noteKeyMap[key.toLowerCase()]
+      if (note) {
+        // Попробуем найти ноту в любой октаве
+        const matchingNote = platforms.find(p => p.note.startsWith(note))?.note
+        if (matchingNote) {
+          handleUserInput(matchingNote)
+        }
+      }
+    }
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      setPressedKeys(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(event.key)
+        return newSet
+      })
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [isListening, platforms, handleUserInput])
+
+  // Обработка клика по платформам
+  const handleCanvasClick = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isListening) return
+
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const rect = canvas.getBoundingClientRect()
+    const clickX = event.clientX - rect.left
+    const clickY = event.clientY - rect.top
+
+    // Находим платформу, по которой кликнули
+    const clickedPlatform = platforms.find(platform =>
+      clickX >= platform.x &&
+      clickX <= platform.x + platform.width &&
+      clickY >= platform.y &&
+      clickY <= platform.y + platform.height
+    )
+
+    if (clickedPlatform) {
+      handleUserInput(clickedPlatform.note)
+    }
+  }, [isListening, platforms, handleUserInput])
+
+  // Реакция на новый звук пользователя (сохраняем оригинальную функциональность)
   useEffect(() => {
     if (!isListening) {
       setIsRoosterJumping(false)
@@ -232,41 +352,9 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
 
     if (detectedNote && detectedNote !== prevDetectedNoteRef.current) {
       prevDetectedNoteRef.current = detectedNote
-      const currentPlatform = platforms.find((p) => p.isCurrent)
-
-      if (currentPlatform && detectedNote === currentPlatform.note) {
-        // Успешное попадание - плавный прыжок к платформе
-        const targetX = currentPlatform.x + currentPlatform.width / 2
-        const targetY = currentPlatform.y - 60 // Позиция петуха на платформе
-
-        createSmoothJump(roosterPosition.x, roosterPosition.y, targetX, targetY, true)
-        setIsRoosterJumping(true)
-        setIsLockedOnPlatform(true)
-
-        if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
-        jumpTimeoutRef.current = setTimeout(() => {
-          setIsRoosterJumping(false)
-          setJumpAnimation(prev => ({ ...prev, isActive: false }))
-          // Добавляем эффект приземления
-          setRoosterState(prev => ({
-            ...prev,
-            isLanding: true,
-            landingStartTime: Date.now(),
-          }))
-        }, jumpAnimation.duration + 150) // +150ms для anticipation
-
-      } else if (!isLockedOnPlatform) {
-        // Неправильная нота - небольшой прыжок на месте
-        createSmoothJump(roosterPosition.x, roosterPosition.y, roosterPosition.x + (Math.random() - 0.5) * 40, roosterPosition.y, false)
-        setIsRoosterJumping(true)
-        if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
-        jumpTimeoutRef.current = setTimeout(() => {
-          setIsRoosterJumping(false)
-          setJumpAnimation(prev => ({ ...prev, isActive: false }))
-        }, 600 + 150) // +150ms для anticipation
-      }
+      handleUserInput(detectedNote)
     }
-  }, [detectedNote, isListening, platforms, isLockedOnPlatform, roosterPosition, createSmoothJump, jumpAnimation.duration])
+  }, [detectedNote, isListening, handleUserInput])
 
   // Сброс блокировки при переходе к следующей платформе
   useEffect(() => {
@@ -459,20 +547,48 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
     platforms.forEach((platform, index) => {
       const px = platform.x
       let color = '#3a1c71'
+      let strokeColor = '#ffe066'
+      let textColor = '#fff'
+
       if (platform.isMatched) {
         color = '#ff9800'
+        strokeColor = '#ffcc02'
       } else if (platform.isCurrent) {
         color = '#ffe066'
+        strokeColor = '#fff'
+        textColor = '#3a1c71'
       }
+
+      // Рисуем тень платформы
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.3)'
+      ctx.fillRect(px + 3, platform.y + 3, platform.width, platform.height)
+
+      // Рисуем основную платформу
       ctx.fillStyle = color
       ctx.fillRect(px, platform.y, platform.width, platform.height)
-      ctx.strokeStyle = '#ffe066'
-      ctx.lineWidth = 2
+
+      // Рисуем границу платформы
+      ctx.strokeStyle = strokeColor
+      ctx.lineWidth = platform.isCurrent ? 3 : 2
       ctx.strokeRect(px, platform.y, platform.width, platform.height)
-      ctx.fillStyle = '#fff'
-      ctx.font = 'bold 14px Arial'
+
+      // Рисуем номер платформы
+      ctx.fillStyle = textColor
+      ctx.font = 'bold 16px Arial'
       ctx.textAlign = 'center'
       ctx.fillText(`${index + 1}`, px + platform.width / 2, platform.y + 15)
+
+      // Рисуем название ноты под платформой
+      ctx.fillStyle = '#fffbe6'
+      ctx.font = 'bold 12px Arial'
+      ctx.fillText(platform.note, px + platform.width / 2, platform.y + platform.height + 15)
+
+      // Добавляем пульсирующий эффект для текущей платформы
+      if (platform.isCurrent) {
+        const pulseAlpha = (Math.sin(Date.now() * 0.008) + 1) * 0.2 + 0.1
+        ctx.fillStyle = `rgba(255, 224, 102, ${pulseAlpha})`
+        ctx.fillRect(px - 5, platform.y - 5, platform.width + 10, platform.height + 10)
+      }
     })
   }, [platforms, roosterPosition, starField, starParallax])
 
@@ -483,6 +599,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         className="platform-game-canvas"
         width={800}
         height={600}
+        onClick={handleCanvasClick}
       />
       <div
         className="rooster-game-character"
@@ -502,6 +619,41 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
           />
         </div>
       </div>
+      {isListening && (
+        <div className="platform-game-controls-hint">
+          <div className="controls-hint-row">
+            <span className="controls-hint-icon">🎤</span>
+            <span className="controls-hint-text">Sing or hum the melody</span>
+          </div>
+          <div className="controls-hint-row">
+            <span className="controls-hint-icon">⌨️</span>
+            <span className="controls-hint-text">
+              Press numbers:
+              {Array.from({ length: melodyLength }, (_, i) => (
+                <span
+                  key={i}
+                  className={`key-indicator ${pressedKeys.has((i + 1).toString()) ? 'pressed' : ''}`}
+                >
+                  {i + 1}
+                </span>
+              ))}
+              or notes:
+              {['C', 'D', 'E', 'F', 'G', 'A', 'B'].map(note => (
+                <span
+                  key={note}
+                  className={`key-indicator ${pressedKeys.has(note.toLowerCase()) ? 'pressed' : ''}`}
+                >
+                  {note}
+                </span>
+              ))}
+            </span>
+          </div>
+          <div className="controls-hint-row">
+            <span className="controls-hint-icon">🖱️</span>
+            <span className="controls-hint-text">Click on platforms to jump</span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
