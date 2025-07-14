@@ -1,54 +1,59 @@
-# React + TypeScript + Vite
+# Ear Warrior
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Musical ear training game with analog synthesizer integration.
 
-Currently, two official plugins are available:
+## 🎹 New Feature: Analog Synthesizer
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Experience warm analog sounds while training your musical ear! The built-in analog synthesizer adds a new dimension to your practice sessions.
 
-## Expanding the ESLint configuration
+### Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **🎸 Lead Sounds**: Sharp and cutting lead tones perfect for melodies
+- **🌊 Pad Sounds**: Warm and atmospheric textures for ambient practice  
+- **🔊 Bass Sounds**: Deep and punchy bass tones with character
+- **⚡ Arp Sounds**: Quick and percussive sounds for rhythmic training
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+### Analog Character
+
+- **Drift**: Subtle pitch instability for authentic analog feel
+- **Warmth**: High-frequency rolloff for vintage character
+- **Saturation**: Harmonic distortion for analog richness
+- **Effects**: Built-in chorus, reverb, and ping-pong delay
+
+### How to Use
+
+1. Click the **🎹 Analog Synth** button (purple, top-right corner)
+2. Choose from 4 preset sounds: Lead, Pad, Bass, or Arp
+3. Play notes using the virtual keyboard
+4. Adjust parameters with the analog-style knobs:
+   - **Oscillator**: Waveform selection and detuning
+   - **Filter**: Cutoff, resonance, and envelope amount
+   - **Envelope**: Attack, decay, sustain, release (ADSR)
+   - **Effects**: Chorus, reverb, and delay controls
+   - **Analog Character**: Drift, warmth, and saturation
+
+### Technical Details
+
+Built with:
+- **Tone.js** for audio synthesis and effects
+- **React** for the user interface  
+- **Zustand** for state management
+- **Feature Slice Design** architecture
+
+The synthesizer uses polyphonic synthesis with:
+- Multiple oscillator waveforms (sawtooth, square, triangle, sine)
+- Analog-style filter with resonance
+- Frequency envelope for filter modulation  
+- LFO for pitch drift simulation
+- Professional effects chain
+
+## Development
+
+```bash
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Original Game Features
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
-```
+This project includes all the original Ear Warrior functionality plus the new analog synthesizer enhancement.

@@ -1,3 +1,4 @@
-export * from './melody-generation/model/melody-generator'
-export * from './pitch-detection/model/pitch-detector'
-export * from './game-logic/model/game-logic'
+export * from './game-logic'
+export * from './melody-generation'
+export * from './pitch-detection'
+export * from './analog-synth'

@@ -1,0 +1,145 @@
+.synth-keyboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: linear-gradient(145deg, #34495e, #2c3e50);
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #4a6278;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.keyboard-info {
+  text-align: center;
+  
+  h4 {
+    color: #ecf0f1;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+  }
+  
+  p {
+    color: #bdc3c7;
+    font-size: 11px;
+    margin: 0;
+    opacity: 0.8;
+  }
+}
+
+.keyboard {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.white-keys {
+  display: flex;
+  gap: 1px;
+}
+
+.white-key {
+  width: 32px;
+  height: 120px;
+  background: linear-gradient(180deg, #f8f9fa, #e9ecef);
+  border: 1px solid #ced4da;
+  border-radius: 0 0 4px 4px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.1s ease;
+  
+  &:hover {
+    background: linear-gradient(180deg, #e9ecef, #dee2e6);
+    transform: translateY(1px);
+  }
+  
+  &:active {
+    background: linear-gradient(180deg, #dee2e6, #ced4da);
+    transform: translateY(2px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .key-label {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    color: #495057;
+    pointer-events: none;
+  }
+}
+
+.black-keys {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 80px;
+}
+
+.black-key {
+  position: absolute;
+  width: 20px;
+  height: 80px;
+  background: linear-gradient(180deg, #343a40, #212529);
+  border: 1px solid #000;
+  border-radius: 0 0 2px 2px;
+  cursor: pointer;
+  z-index: 1;
+  transition: all 0.1s ease;
+  
+  &:hover {
+    background: linear-gradient(180deg, #495057, #343a40);
+    transform: translateY(1px);
+  }
+  
+  &:active {
+    background: linear-gradient(180deg, #212529, #000);
+    transform: translateY(2px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .key-label {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    font-weight: 600;
+    color: #fff;
+    pointer-events: none;
+  }
+}
+
+.keyboard-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.demo-button {
+  background: linear-gradient(145deg, #27ae60, #229954);
+  border: 1px solid #1e8449;
+  border-radius: 6px;
+  padding: 8px 16px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: linear-gradient(145deg, #229954, #1e8449);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(39, 174, 96, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+}
