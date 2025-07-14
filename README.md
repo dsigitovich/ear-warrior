@@ -1,4 +1,51 @@
-# 🎵 Ear Warrior - Project Documentation
+# 🎵 Ear Warrior - Musical Ear Training Game
+
+## 🎹 New Feature: Analog Synthesizer
+
+Experience warm analog sounds while training your musical ear! The built-in analog synthesizer adds a new dimension to your practice sessions.
+
+### Features
+
+- **🎸 Lead Sounds**: Sharp and cutting lead tones perfect for melodies
+- **🌊 Pad Sounds**: Warm and atmospheric textures for ambient practice  
+- **🔊 Bass Sounds**: Deep and punchy bass tones with character
+- **⚡ Arp Sounds**: Quick and percussive sounds for rhythmic training
+
+### Analog Character
+
+- **Drift**: Subtle pitch instability for authentic analog feel
+- **Warmth**: High-frequency rolloff for vintage character
+- **Saturation**: Harmonic distortion for analog richness
+- **Effects**: Built-in chorus, reverb, and ping-pong delay
+
+### How to Use
+
+1. Click the **� Analog Synth** button (purple, top-right corner)
+2. Choose from 4 preset sounds: Lead, Pad, Bass, or Arp
+3. Play notes using the virtual keyboard
+4. Adjust parameters with the analog-style knobs:
+   - **Oscillator**: Waveform selection and detuning
+   - **Filter**: Cutoff, resonance, and envelope amount
+   - **Envelope**: Attack, decay, sustain, release (ADSR)
+   - **Effects**: Chorus, reverb, and delay controls
+   - **Analog Character**: Drift, warmth, and saturation
+
+### Technical Details
+
+Built with:
+- **Tone.js** for audio synthesis and effects
+- **React** for the user interface  
+- **Zustand** for state management
+- **Feature Slice Design** architecture
+
+The synthesizer uses polyphonic synthesis with:
+- Multiple oscillator waveforms (sawtooth, square, triangle, sine)
+- Analog-style filter with resonance
+- Frequency envelope for filter modulation  
+- LFO for pitch drift simulation
+- Professional effects chain
+
+---
 
 ## 📋 Project Overview
 
@@ -11,6 +58,7 @@
 - **Scoring System** - Rewards for correct answers and streaks
 - **Progressive Difficulty** - 4 difficulty levels from beginner to advanced
 - **Visual Feedback** - Animated interface with rooster character
+- **Analog Synthesizer** - Built-in analog synthesizer with multiple presets
 
 ## 🏗️ Project Architecture
 
@@ -23,10 +71,12 @@ The project uses **Feature Slice Design** architecture:
 │   ├── melody/          # Melody model
 │   └── note/            # Note model
 ├── ⚡ features/          # Business logic
+│   ├── analog-synth/    # Analog synthesizer
 │   ├── game-logic/      # Game logic
 │   ├── melody-generation/  # Melody generation
 │   └── pitch-detection/    # Pitch detection
 ├── 🧩 widgets/          # Composite components
+│   ├── analog-synth-widget/ # Synthesizer widget
 │   ├── game-panel/      # Control panel
 │   ├── platform-game/   # Game platform
 │   ├── score-panel/     # Score panel
@@ -238,19 +288,24 @@ graph TB
     A --> C[ScorePanel]
     A --> D[PlatformGame]
     A --> E[WaveformDisplay]
+    A --> F[AnalogSynthWidget]
     
-    B --> F[Button]
-    B --> G[Difficulty Selector]
+    B --> G[Button]
+    B --> H[Difficulty Selector]
     
-    C --> H[Score Display]
-    C --> I[Streak Counter]
-    C --> J[Attempts Hearts]
+    C --> I[Score Display]
+    C --> J[Streak Counter]
+    C --> K[Attempts Hearts]
     
-    D --> K[RoosterIcon]
-    D --> L[Note Platforms]
+    D --> L[RoosterIcon]
+    D --> M[Note Platforms]
     
-    E --> M[Real-time Waveform]
-    E --> N[Pitch Visualization]
+    E --> N[Real-time Waveform]
+    E --> O[Pitch Visualization]
+    
+    F --> P[AnalogSynth]
+    F --> Q[SynthController]
+    F --> R[SynthKeyboard]
 ```
 
 ## 🚀 Getting Started
@@ -276,9 +331,9 @@ npm run deploy
 
 The project supports various screen sizes:
 
-- **Desktop**: Full-screen game mode
+- **Desktop**: Full-screen game mode with analog synthesizer
 - **Tablet**: Adapted interface
-- **Mobile**: Mobile version (in development)
+- **Mobile**: Mobile version with responsive synthesizer interface
 
 ## 🔧 Configuration
 
@@ -322,6 +377,7 @@ export const GAME_CONFIG = {
 - [ ] Chord recognition
 - [ ] Social features
 - [ ] Achievement system
+- [x] Analog synthesizer integration
 
 ### Phase 3: Educational Platform
 - [ ] Music theory integration
