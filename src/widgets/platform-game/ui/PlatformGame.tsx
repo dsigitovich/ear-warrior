@@ -30,6 +30,14 @@ interface JumpAnimation {
   targetX: number;
   targetY: number;
   peakY: number;
+  easeType: 'success' | 'miss';
+}
+
+interface RoosterState {
+  isLanding: boolean;
+  landingStartTime: number;
+  isAnticipating: boolean;
+  anticipationStartTime: number;
 }
 
 export const PlatformGame: React.FC<PlatformGameProps> = ({
@@ -45,6 +53,12 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   const [roosterPosition, setRoosterPosition] = useState({ x: 400, y: 300 })
   const roosterVelocityRef = useRef({ x: 2, y: 0 })
   const [isRoosterJumping, setIsRoosterJumping] = useState(false)
+  const [roosterState, setRoosterState] = useState<RoosterState>({
+    isLanding: false,
+    landingStartTime: 0,
+    isAnticipating: false,
+    anticipationStartTime: 0,
+  })
   const [jumpAnimation, setJumpAnimation] = useState<JumpAnimation>({
     isActive: false,
     startTime: 0,
@@ -54,11 +68,13 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
     targetX: 0,
     targetY: 0,
     peakY: 0,
+    easeType: 'success',
   })
 
   // Используем refs для стабильных ссылок на данные
   const platformsRef = useRef<Platform[]>([])
   const jumpAnimationRef = useRef<JumpAnimation>(jumpAnimation)
+  const roosterStateRef = useRef<RoosterState>(roosterState)
 
   // Обновляем refs при изменении данных
   useEffect(() => {
@@ -68,6 +84,10 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   useEffect(() => {
     jumpAnimationRef.current = jumpAnimation
   }, [jumpAnimation])
+
+  useEffect(() => {
+    roosterStateRef.current = roosterState
+  }, [roosterState])
 
   // Генерируем платформы на основе мелодии
   useEffect(() => {
@@ -136,22 +156,61 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   // Для хранения id таймера прыжка
   const jumpTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Функция для создания плавного прыжка
-  const createSmoothJump = useCallback((startX: number, startY: number, targetX: number, targetY: number) => {
-    const distance = Math.abs(targetX - startX)
-    const jumpHeight = Math.max(80, distance * 0.3) // Высота прыжка зависит от расстояния
-    const duration = Math.max(800, distance * 2) // Длительность зависит от расстояния
+  // Улучшенная функция easing
+  const easeOutBounce = (t: number): number => {
+    const n1 = 7.5625
+    const d1 = 2.75
+    if (t < 1 / d1) {
+      return n1 * t * t
+    } else if (t < 2 / d1) {
+      return n1 * (t -= 1.5 / d1) * t + 0.75
+    } else if (t < 2.5 / d1) {
+      return n1 * (t -= 2.25 / d1) * t + 0.9375
+    } else {
+      return n1 * (t -= 2.625 / d1) * t + 0.984375
+    }
+  }
 
-    setJumpAnimation({
-      isActive: true,
-      startTime: Date.now(),
-      duration,
-      startX,
-      startY,
-      targetX,
-      targetY,
-      peakY: Math.min(startY, targetY) - jumpHeight,
-    })
+  const easeInOutCubic = (t: number): number => {
+    return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+  }
+
+  const easeOutElastic = (t: number): number => {
+    const c4 = (2 * Math.PI) / 3
+    return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1
+  }
+
+  // Функция для создания плавного прыжка с улучшенными кривыми
+  const createSmoothJump = useCallback((startX: number, startY: number, targetX: number, targetY: number, isSuccess: boolean = true) => {
+    const distance = Math.abs(targetX - startX)
+    const jumpHeight = isSuccess ? Math.max(100, distance * 0.4) : 60 // Выше прыжок для успешных попаданий
+    const duration = isSuccess ? Math.max(1000, distance * 1.8) : 600 // Дольше для успешных прыжков
+
+    // Добавляем anticipation (подготовку к прыжку)
+    setRoosterState(prev => ({
+      ...prev,
+      isAnticipating: true,
+      anticipationStartTime: Date.now(),
+    }))
+
+    // Запускаем прыжок с небольшой задержкой для anticipation
+    setTimeout(() => {
+      setJumpAnimation({
+        isActive: true,
+        startTime: Date.now(),
+        duration,
+        startX,
+        startY,
+        targetX,
+        targetY,
+        peakY: Math.min(startY, targetY) - jumpHeight,
+        easeType: isSuccess ? 'success' : 'miss',
+      })
+      setRoosterState(prev => ({
+        ...prev,
+        isAnticipating: false,
+      }))
+    }, 150) // 150ms anticipation
   }, [])
 
   // Реакция на новый звук пользователя
@@ -162,6 +221,12 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
       prevDetectedNoteRef.current = null
       if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
       setJumpAnimation(prev => ({ ...prev, isActive: false }))
+      setRoosterState({
+        isLanding: false,
+        landingStartTime: 0,
+        isAnticipating: false,
+        anticipationStartTime: 0,
+      })
       return
     }
 
@@ -174,7 +239,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         const targetX = currentPlatform.x + currentPlatform.width / 2
         const targetY = currentPlatform.y - 60 // Позиция петуха на платформе
 
-        createSmoothJump(roosterPosition.x, roosterPosition.y, targetX, targetY)
+        createSmoothJump(roosterPosition.x, roosterPosition.y, targetX, targetY, true)
         setIsRoosterJumping(true)
         setIsLockedOnPlatform(true)
 
@@ -182,13 +247,23 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         jumpTimeoutRef.current = setTimeout(() => {
           setIsRoosterJumping(false)
           setJumpAnimation(prev => ({ ...prev, isActive: false }))
-        }, jumpAnimation.duration)
+          // Добавляем эффект приземления
+          setRoosterState(prev => ({
+            ...prev,
+            isLanding: true,
+            landingStartTime: Date.now(),
+          }))
+        }, jumpAnimation.duration + 150) // +150ms для anticipation
 
       } else if (!isLockedOnPlatform) {
         // Неправильная нота - небольшой прыжок на месте
+        createSmoothJump(roosterPosition.x, roosterPosition.y, roosterPosition.x + (Math.random() - 0.5) * 40, roosterPosition.y, false)
         setIsRoosterJumping(true)
         if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
-        jumpTimeoutRef.current = setTimeout(() => setIsRoosterJumping(false), 300)
+        jumpTimeoutRef.current = setTimeout(() => {
+          setIsRoosterJumping(false)
+          setJumpAnimation(prev => ({ ...prev, isActive: false }))
+        }, 600 + 150) // +150ms для anticipation
       }
     }
   }, [detectedNote, isListening, platforms, isLockedOnPlatform, roosterPosition, createSmoothJump, jumpAnimation.duration])
@@ -197,12 +272,19 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   useEffect(() => {
     setIsLockedOnPlatform(false)
     setJumpAnimation(prev => ({ ...prev, isActive: false }))
+    setRoosterState({
+      isLanding: false,
+      landingStartTime: 0,
+      isAnticipating: false,
+      anticipationStartTime: 0,
+    })
   }, [currentNoteIndex])
 
-  // Анимация петуха с плавной траекторией
+  // Анимация петуха с улучшенной плавной траекторией
   useEffect(() => {
     let animationId: number
-    const gravity = 0.8
+    const gravity = 0.5 // Уменьшенная гравитация для более плавного движения
+    const airResistance = 0.995 // Сопротивление воздуха для более реалистичного движения
 
     const animate = () => {
       setRoosterPosition(prev => {
@@ -210,49 +292,69 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         let newY = prev.y
         let velocity = roosterVelocityRef.current
         const currentJumpAnimation = jumpAnimationRef.current
+        const currentRoosterState = roosterStateRef.current
 
         if (currentJumpAnimation.isActive) {
-          // Плавная анимация прыжка
+          // Улучшенная анимация прыжка с разными кривыми для разных типов
           const elapsed = Date.now() - currentJumpAnimation.startTime
           const progress = Math.min(elapsed / currentJumpAnimation.duration, 1)
 
-          // Используем кривую Безье для плавной траектории
-          const t = progress
-          const t2 = t * t
-          const t3 = t2 * t
-          const mt = 1 - t
-          const mt2 = mt * mt
-          const mt3 = mt2 * mt
+          let easedProgress: number
+          if (currentJumpAnimation.easeType === 'success') {
+            // Успешный прыжок - более плавная кривая
+            easedProgress = easeInOutCubic(progress)
+          } else {
+            // Промах - более резкая кривая
+            easedProgress = easeOutElastic(progress)
+          }
 
-          // Контрольные точки для кривой Безье
-          const cp1x = currentJumpAnimation.startX + (currentJumpAnimation.targetX - currentJumpAnimation.startX) * 0.25
-          const cp1y = currentJumpAnimation.peakY
-          const cp2x = currentJumpAnimation.startX + (currentJumpAnimation.targetX - currentJumpAnimation.startX) * 0.75
-          const cp2y = currentJumpAnimation.peakY
+          // Горизонтальное движение
+          newX = currentJumpAnimation.startX + (currentJumpAnimation.targetX - currentJumpAnimation.startX) * easedProgress
 
-          // Кривая Безье: B(t) = (1-t)³P₀ + 3(1-t)²tP₁ + 3(1-t)t²P₂ + t³P₃
-          newX = mt3 * currentJumpAnimation.startX +
-                 3 * mt2 * t * cp1x +
-                 3 * mt * t2 * cp2x +
-                 t3 * currentJumpAnimation.targetX
+          // Вертикальное движение с параболой для реалистичной физики
+          const heightProgress = 4 * progress * (1 - progress) // Парабола для естественной траектории
+          const peakOffset = currentJumpAnimation.peakY - Math.max(currentJumpAnimation.startY, currentJumpAnimation.targetY)
+          newY = Math.max(currentJumpAnimation.startY, currentJumpAnimation.targetY) +
+                 peakOffset * heightProgress +
+                 (currentJumpAnimation.targetY - currentJumpAnimation.startY) * easedProgress
 
-          newY = mt3 * currentJumpAnimation.startY +
-                 3 * mt2 * t * cp1y +
-                 3 * mt * t2 * cp2y +
-                 t3 * currentJumpAnimation.targetY
+          // Добавляем небольшие колебания для более живой анимации
+          const wobbleX = Math.sin(progress * Math.PI * 3) * 1.5
+          const wobbleY = Math.sin(progress * Math.PI * 6) * 0.8
+          newX += wobbleX
+          newY += wobbleY
 
-          // Добавляем небольшое колебание для более естественного движения
-          const wobble = Math.sin(progress * Math.PI * 4) * 2
-          newY += wobble
+        } else if (currentRoosterState.isAnticipating) {
+          // Эффект anticipation - легкое приседание перед прыжком
+          const elapsed = Date.now() - currentRoosterState.anticipationStartTime
+          const anticipationProgress = Math.min(elapsed / 150, 1)
+          const squashEffect = Math.sin(anticipationProgress * Math.PI) * 3
+          newY = prev.y + squashEffect
+
+        } else if (currentRoosterState.isLanding) {
+          // Эффект приземления с отскоком
+          const elapsed = Date.now() - currentRoosterState.landingStartTime
+          const landingProgress = Math.min(elapsed / 400, 1)
+
+          if (landingProgress < 1) {
+            const bounceEffect = easeOutBounce(landingProgress) * 8
+            newY = prev.y - bounceEffect
+          } else {
+            // Завершаем эффект приземления
+            setRoosterState(prevState => ({
+              ...prevState,
+              isLanding: false,
+            }))
+          }
 
         } else {
-          // Обычная физика для свободного падения
+          // Обычная физика для свободного падения с улучшениями
           newX = prev.x + velocity.x
           newY = prev.y + velocity.y
 
-          // Применяем гравитацию
+          // Применяем гравитацию и сопротивление воздуха
           velocity = {
-            x: velocity.x * 0.98,
+            x: velocity.x * airResistance,
             y: velocity.y + gravity,
           }
           roosterVelocityRef.current = velocity
@@ -268,19 +370,37 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
               // Петух приземлился на платформу
               newY = platform.y - 60
               roosterVelocityRef.current = { ...velocity, y: 0 }
+
+              // Добавляем эффект приземления
+              setRoosterState(prev => ({
+                ...prev,
+                isLanding: true,
+                landingStartTime: Date.now(),
+              }))
             }
           })
 
-          // Ограничиваем движение
-          if (newX < 100) newX = 100
-          if (newX > 700) newX = 700
+          // Ограничиваем движение с более плавными границами
+          if (newX < 100) {
+            newX = 100
+            roosterVelocityRef.current = { ...velocity, x: Math.abs(velocity.x) * 0.7 }
+          }
+          if (newX > 700) {
+            newX = 700
+            roosterVelocityRef.current = { ...velocity, x: -Math.abs(velocity.x) * 0.7 }
+          }
           if (newY > 450) {
             newY = 450
-            roosterVelocityRef.current = { ...velocity, y: 0 }
+            roosterVelocityRef.current = { ...velocity, y: -Math.abs(velocity.y) * 0.3 } // Небольшой отскок от земли
+            setRoosterState(prev => ({
+              ...prev,
+              isLanding: true,
+              landingStartTime: Date.now(),
+            }))
           }
           if (newY < 50) {
             newY = 50
-            roosterVelocityRef.current = { ...velocity, y: 0 }
+            roosterVelocityRef.current = { ...velocity, y: Math.abs(velocity.y) * 0.3 }
           }
         }
 
@@ -378,7 +498,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
           <RoosterIcon
             width={64}
             height={64}
-            jumping={isRoosterJumping}
+            jumping={isRoosterJumping || roosterState.isAnticipating}
           />
         </div>
       </div>
