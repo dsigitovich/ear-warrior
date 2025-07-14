@@ -5,7 +5,7 @@ import { NOTES, INTERVALS, DIFFICULTY_LEVELS } from '../../../shared/config/cons
 const melodyHistory = new Set<string>()
 
 // Enhanced random number generation with better entropy
-function enhancedRandom(): number {
+function enhancedRandom (): number {
   // Use current timestamp, performance counter, and Math.random for better entropy
   const timestamp = Date.now()
   const performance = typeof window !== 'undefined' && window.performance ? window.performance.now() : 0
@@ -14,31 +14,31 @@ function enhancedRandom(): number {
 }
 
 // Check if a melody is unique (not previously generated)
-function isMelodyUnique(melody: string[]): boolean {
+function isMelodyUnique (melody: string[]): boolean {
   const melodyKey = melody.join('-')
   return !melodyHistory.has(melodyKey)
 }
 
 // Add melody to history
-function addMelodyToHistory(melody: string[]): void {
+function addMelodyToHistory (melody: string[]): void {
   const melodyKey = melody.join('-')
   melodyHistory.add(melodyKey)
 }
 
 // Clear melody history (useful for testing or resetting)
-export function clearMelodyHistory(): void {
+export function clearMelodyHistory (): void {
   melodyHistory.clear()
 }
 
 // Get the number of unique melodies generated so far
-export function getMelodyHistorySize(): number {
+export function getMelodyHistorySize (): number {
   return melodyHistory.size
 }
 
 export function generateMelodyWithIntervals (difficulty: Difficulty): string[] {
   const level = DIFFICULTY_LEVELS.find(l => l.value === difficulty) || DIFFICULTY_LEVELS[1]
   const notesCount = level?.notes ?? 3
-  
+
   let melody: string[] = []
   let attempts = 0
   const maxAttempts = 100 // Maximum attempts to find a unique melody
@@ -110,7 +110,7 @@ export function generateMelodyWithIntervals (difficulty: Difficulty): string[] {
     }
 
     attempts++
-    
+
     // If we've tried too many times, break to avoid infinite loop
     if (attempts >= maxAttempts) {
       console.warn(`Could not generate unique melody after ${maxAttempts} attempts. Using potentially duplicate melody.`)
@@ -120,7 +120,7 @@ export function generateMelodyWithIntervals (difficulty: Difficulty): string[] {
 
   // Add the unique melody to history
   addMelodyToHistory(melody)
-  
+
   return melody
 }
 
@@ -139,7 +139,7 @@ export function generateRandomMelody (length: number = 5): string[] {
     }
 
     attempts++
-    
+
     // If we've tried too many times, break to avoid infinite loop
     if (attempts >= maxAttempts) {
       console.warn(`Could not generate unique melody after ${maxAttempts} attempts. Using potentially duplicate melody.`)
@@ -149,6 +149,6 @@ export function generateRandomMelody (length: number = 5): string[] {
 
   // Add the unique melody to history
   addMelodyToHistory(melody)
-  
+
   return melody
 }

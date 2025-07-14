@@ -26,13 +26,13 @@ describe('Melody Generation', () => {
 
   it('should track melody history correctly', () => {
     expect(getMelodyHistorySize()).toBe(0)
-    
+
     generateMelodyWithIntervals('easy')
     expect(getMelodyHistorySize()).toBe(1)
-    
+
     generateMelodyWithIntervals('medium')
     expect(getMelodyHistorySize()).toBe(2)
-    
+
     generateRandomMelody(4)
     expect(getMelodyHistorySize()).toBe(3)
   })
@@ -41,7 +41,7 @@ describe('Melody Generation', () => {
     generateMelodyWithIntervals('easy')
     generateMelodyWithIntervals('medium')
     expect(getMelodyHistorySize()).toBe(2)
-    
+
     clearMelodyHistory()
     expect(getMelodyHistorySize()).toBe(0)
   })
@@ -56,7 +56,7 @@ describe('Melody Generation', () => {
     }
 
     const uniqueMelodies = new Set(melodies)
-    
+
     // Should be 100% unique
     expect(uniqueMelodies.size).toBe(numTests)
   })
@@ -82,18 +82,18 @@ describe('Melody Generation', () => {
 
   it('should maintain uniqueness across different difficulty levels', () => {
     const allMelodies = new Set()
-    
+
     // Generate melodies of different difficulties
     for (let i = 0; i < 10; i++) {
       const easy = generateMelodyWithIntervals('easy')
       const medium = generateMelodyWithIntervals('medium')
       const hard = generateMelodyWithIntervals('hard')
-      
+
       allMelodies.add(easy.join('-'))
       allMelodies.add(medium.join('-'))
       allMelodies.add(hard.join('-'))
     }
-    
+
     // All should be unique
     expect(allMelodies.size).toBe(30)
     expect(getMelodyHistorySize()).toBe(30)
