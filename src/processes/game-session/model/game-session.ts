@@ -14,6 +14,7 @@ export function useGameSession () {
   const difficulty = useDifficultyStore(s => s.difficulty)
   const [game, setGame] = useState<GameEntity>(() => createGame(difficulty))
   const [audioBuffer, setAudioBuffer] = useState<Float32Array>(new Float32Array())
+  const [averageAudioInput, setAverageAudioInput] = useState<number>(0)
 
   const audioContextRef = useRef<AudioContext | null>(null)
   const processorRef = useRef<ScriptProcessorNode | null>(null)
@@ -36,34 +37,26 @@ export function useGameSession () {
     }
   }, [difficulty, game.difficulty])
 
-  // Helper functions for recording period
-  const startRecordingPeriod = useCallback(() => {
-    recordingStartTimeRef.current = Date.now()
-    accumulatedFrequenciesRef.current = []
-
-    // Clear any existing timeout
+  const clearRecordingPeriod = useCallback(() => {
     if (recordingTimeoutRef.current) {
       clearTimeout(recordingTimeoutRef.current)
+      recordingTimeoutRef.current = null
     }
-
-    // Set timeout for 1 second
-    recordingTimeoutRef.current = setTimeout(() => {
-      finishRecordingPeriod()
-    }, AUDIO_CONFIG.RECORDING_DURATION)
+    recordingStartTimeRef.current = null
+    accumulatedFrequenciesRef.current = []
   }, [])
 
-  const finishRecordingPeriod = useCallback(() => {
+  function finishRecordingPeriod () {
     const averageFrequency = calculateAverageFrequency(accumulatedFrequenciesRef.current)
 
     if (averageFrequency) {
       const detectedNote = findClosestNote(averageFrequency)
       setGame(prev => setDetectedPitch(prev, averageFrequency))
       setGame(prev => setDetectedNote(prev, detectedNote))
+      setAverageAudioInput(averageFrequency)
 
-      // Process the detected note
       if (detectedNote && gameMelodyRef.current && !isProcessingRef.current) {
         isProcessingRef.current = true
-
         setGame(prev => {
           const newGame = addUserInput(prev, detectedNote)
           let attempts = prev.attemptsLeft
@@ -88,7 +81,6 @@ export function useGameSession () {
               setGame(prev => setFeedback(prev, 'Try again!'))
               setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
               replayMelody()
-              // Start new recording period after replay
               setTimeout(() => {
                 startRecordingPeriod()
                 isProcessingRef.current = false
@@ -109,7 +101,6 @@ export function useGameSession () {
             return { ...updatedGame, attemptsLeft: 3 }
           }
 
-          // Start new recording period for next note
           setTimeout(() => {
             startRecordingPeriod()
             isProcessingRef.current = false
@@ -119,72 +110,39 @@ export function useGameSession () {
         })
       }
     } else {
-      // No valid frequency detected, start new recording period
+      setAverageAudioInput(0)
       setTimeout(() => {
         startRecordingPeriod()
       }, 100)
     }
-
-    // Clear timeout reference
     recordingTimeoutRef.current = null
-  }, [])
+  }
 
-  const clearRecordingPeriod = useCallback(() => {
+  function startRecordingPeriod () {
+    recordingStartTimeRef.current = Date.now()
+    accumulatedFrequenciesRef.current = []
     if (recordingTimeoutRef.current) {
       clearTimeout(recordingTimeoutRef.current)
-      recordingTimeoutRef.current = null
     }
-    recordingStartTimeRef.current = null
-    accumulatedFrequenciesRef.current = []
-  }, [])
+    recordingTimeoutRef.current = setTimeout(() => {
+      finishRecordingPeriod()
+    }, AUDIO_CONFIG.RECORDING_DURATION)
+  }
 
-  const playMelody = useCallback(async () => {
-    try {
-      setGame(prev => ({ ...setGameState(prev, 'playing'), attemptsLeft: 3 }))
-      setGame(prev => resetGameInput(prev))
+  const stopListening = useCallback(() => {
+    setGame(prev => setGameState(prev, 'idle'))
+    isListeningRef.current = false
+    setGame(prev => setCurrentMelody(prev, null))
+    setGame(prev => resetGameInput(prev))
 
-      // Отключаем микрофон перед проигрыванием мелодии
-      stopListening()
+    // Clear recording period
+    clearRecordingPeriod()
 
-      if (!audioContextRef.current) {
-        audioContextRef.current = new window.AudioContext()
-      }
-      if (audioContextRef.current.state !== 'running') {
-        await audioContextRef.current.resume()
-      }
-
-      const newMelodyNotes = generateMelodyWithIntervals(game.difficulty)
-      const newMelody = createMelody(newMelodyNotes)
-
-      setGame(prev => setCurrentMelody(prev, newMelody))
-      await Tone.start()
-
-      const synth = new Tone.AMSynth().toDestination()
-      let time = 0
-      newMelody.notes.forEach((note) => {
-        // Convert note to frequency
-        const noteIndex = NOTES.indexOf(note.name)
-        if (noteIndex === -1) {
-          return
-        }
-        // Use MIDI note number instead of frequency
-        const midiNoteNumber = noteIndex + ((note.octave ?? 4) + 1) * 12
-        synth.triggerAttackRelease(midiNoteNumber, AUDIO_CONFIG.NOTE_DURATION, Tone.now() + time)
-        time += AUDIO_CONFIG.NOTE_INTERVAL
-      })
-
-      const delay = newMelodyNotes.length * AUDIO_CONFIG.NOTE_INTERVAL * 1000 + 200
-
-      setTimeout(() => {
-        setGame(prev => setGameState(prev, 'listening'))
-        isListeningRef.current = true
-        startListening()
-        startRecordingPeriod()
-      }, delay)
-    } catch {
-      setGame(prev => setFeedback(prev, 'Error playing melody'))
+    if (processorRef.current) {
+      processorRef.current.disconnect()
+      processorRef.current = null
     }
-  }, [game.difficulty])
+  }, [clearRecordingPeriod])
 
   const startListening = useCallback(async () => {
     try {
@@ -235,21 +193,6 @@ export function useGameSession () {
     }
   }, [])
 
-  const stopListening = useCallback(() => {
-    setGame(prev => setGameState(prev, 'idle'))
-    isListeningRef.current = false
-    setGame(prev => setCurrentMelody(prev, null))
-    setGame(prev => resetGameInput(prev))
-
-    // Clear recording period
-    clearRecordingPeriod()
-
-    if (processorRef.current) {
-      processorRef.current.disconnect()
-      processorRef.current = null
-    }
-  }, [clearRecordingPeriod])
-
   const replayMelody = useCallback(async () => {
     if (!game.currentMelody) return
 
@@ -278,6 +221,54 @@ export function useGameSession () {
     })
   }, [game.currentMelody])
 
+  const playMelody = useCallback(async () => {
+    try {
+      setGame(prev => ({ ...setGameState(prev, 'playing'), attemptsLeft: 3 }))
+      setGame(prev => resetGameInput(prev))
+
+      // Отключаем микрофон перед проигрыванием мелодии
+      stopListening()
+
+      if (!audioContextRef.current) {
+        audioContextRef.current = new window.AudioContext()
+      }
+      if (audioContextRef.current.state !== 'running') {
+        await audioContextRef.current.resume()
+      }
+
+      const newMelodyNotes = generateMelodyWithIntervals(game.difficulty)
+      const newMelody = createMelody(newMelodyNotes)
+
+      setGame(prev => setCurrentMelody(prev, newMelody))
+      await Tone.start()
+
+      const synth = new Tone.AMSynth().toDestination()
+      let time = 0
+      newMelody.notes.forEach((note) => {
+        // Convert note to frequency
+        const noteIndex = NOTES.indexOf(note.name)
+        if (noteIndex === -1) {
+          return
+        }
+        // Use MIDI note number instead of frequency
+        const midiNoteNumber = noteIndex + ((note.octave ?? 4) + 1) * 12
+        synth.triggerAttackRelease(midiNoteNumber, AUDIO_CONFIG.NOTE_DURATION, Tone.now() + time)
+        time += AUDIO_CONFIG.NOTE_INTERVAL
+      })
+
+      const delay = newMelodyNotes.length * AUDIO_CONFIG.NOTE_INTERVAL * 1000 + 200
+
+      setTimeout(() => {
+        setGame(prev => setGameState(prev, 'listening'))
+        isListeningRef.current = true
+        startListening()
+        startRecordingPeriod()
+      }, delay)
+    } catch {
+      setGame(prev => setFeedback(prev, 'Error playing melody'))
+    }
+  }, [game.difficulty, stopListening, startListening, startRecordingPeriod])
+
   const changeDifficulty = useCallback((difficulty: Difficulty) => {
     setGame(prev => ({ ...prev, difficulty }))
   }, [])
@@ -285,6 +276,7 @@ export function useGameSession () {
   return {
     game,
     audioBuffer,
+    averageAudioInput,
     playMelody,
     stopListening,
     replayMelody,

@@ -9,6 +9,7 @@ interface PlatformGameProps {
   currentNoteIndex: number;
   isListening: boolean;
   melodyNotes: string[];
+  averageAudioInput?: number; // Среднее значение аудио инпута
 }
 
 interface Platform {
@@ -47,6 +48,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   currentNoteIndex,
   isListening,
   melodyNotes,
+  averageAudioInput = 0,
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [platforms, setPlatforms] = useState<Platform[]>([])
@@ -117,7 +119,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   const STARS_PER_LAYER = 24
   const STAR_COLORS = ['#ffe066', '#fffbe6', '#ffaf7b']
   const STAR_SPEEDS = [0.2, 0.1, 0.05]
-  const STAR_SIZES = [2, 1.2, 0.7]
+  const STAR_SIZES = [2, 1.2, 0.7, 3, 1.5, 0.8, 0.4]
   const CANVAS_WIDTH = 800
   const CANVAS_HEIGHT = 600
 
@@ -137,7 +139,6 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
     return layers
   })
   const [starParallax, setStarParallax] = useState(0)
-  const [pressedKeys, setPressedKeys] = useState<Set<string>>(new Set())
 
   // Анимация параллакса звезд
   useEffect(() => {
@@ -181,20 +182,26 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
     return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1
   }
 
-  // Функция для создания плавного прыжка с улучшенными кривыми
-  const createSmoothJump = useCallback((startX: number, startY: number, targetX: number, targetY: number, isSuccess: boolean = true) => {
+  // Обновляем функцию createSmoothJump для поддержки кастомных параметров
+  const createSmoothJump = useCallback((
+    startX: number,
+    startY: number,
+    targetX: number,
+    targetY: number,
+    isSuccess: boolean = true,
+    customJumpHeight?: number,
+    customDuration?: number
+  ) => {
     const distance = Math.abs(targetX - startX)
-    const jumpHeight = isSuccess ? Math.max(100, distance * 0.4) : 60 // Выше прыжок для успешных попаданий
-    const duration = isSuccess ? Math.max(1000, distance * 1.8) : 600 // Дольше для успешных прыжков
+    const jumpHeight = customJumpHeight || (isSuccess ? Math.max(100, distance * 0.4) : 60)
+    const duration = customDuration || (isSuccess ? Math.max(1000, distance * 1.8) : 600)
 
-    // Добавляем anticipation (подготовку к прыжку)
     setRoosterState(prev => ({
       ...prev,
       isAnticipating: true,
       anticipationStartTime: Date.now(),
     }))
 
-    // Запускаем прыжок с небольшой задержкой для anticipation
     setTimeout(() => {
       setJumpAnimation({
         isActive: true,
@@ -211,7 +218,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         ...prev,
         isAnticipating: false,
       }))
-    }, 150) // 150ms anticipation
+    }, 150)
   }, [])
 
   // Универсальная функция для обработки пользовательского ввода
@@ -222,11 +229,17 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
     const currentPlatform = platforms.find((p) => p.isCurrent)
 
     if (currentPlatform && inputNote === currentPlatform.note) {
-      // Успешное попадание - плавный прыжок к платформе
+      // Успешное попадание - траектория зависит от среднего значения аудио
       const targetX = currentPlatform.x + currentPlatform.width / 2
-      const targetY = currentPlatform.y - 60 // Позиция петуха на платформе
+      const targetY = currentPlatform.y - 60
 
-      createSmoothJump(roosterPosition.x, roosterPosition.y, targetX, targetY, true)
+      // Используем среднее значение аудио для влияния на траекторию
+      const audioInfluence = Math.max(0.5, Math.min(2.0, averageAudioInput / 500)) // Нормализуем влияние
+      const distance = Math.abs(targetX - roosterPosition.x)
+      const jumpHeight = Math.max(100, distance * 0.4) * audioInfluence
+      const duration = Math.max(1000, distance * 1.8) * (1 / audioInfluence) // Более высокий звук = быстрее
+
+      createSmoothJump(roosterPosition.x, roosterPosition.y, targetX, targetY, true, jumpHeight, duration)
       setIsRoosterJumping(true)
       setIsLockedOnPlatform(true)
 
@@ -234,104 +247,50 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
       jumpTimeoutRef.current = setTimeout(() => {
         setIsRoosterJumping(false)
         setJumpAnimation(prev => ({ ...prev, isActive: false }))
-        // Добавляем эффект приземления
         setRoosterState(prev => ({
           ...prev,
           isLanding: true,
           landingStartTime: Date.now(),
         }))
-      }, jumpAnimation.duration + 150) // +150ms для anticipation
+      }, jumpAnimation.duration + 150)
 
     } else if (!isLockedOnPlatform) {
-      // Неправильная нота - небольшой прыжок на месте
-      createSmoothJump(roosterPosition.x, roosterPosition.y, roosterPosition.x + (Math.random() - 0.5) * 40, roosterPosition.y, false)
+      // Неправильная нота - траектория также зависит от аудио
+      const audioInfluence = Math.max(0.3, Math.min(1.5, averageAudioInput / 300))
+      const missJumpHeight = 60 * audioInfluence
+      const missDuration = 600 * (1 / audioInfluence)
+
+      createSmoothJump(
+        roosterPosition.x,
+        roosterPosition.y,
+        roosterPosition.x + (Math.random() - 0.5) * 40,
+        roosterPosition.y,
+        false,
+        missJumpHeight,
+        missDuration
+      )
       setIsRoosterJumping(true)
       if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
       jumpTimeoutRef.current = setTimeout(() => {
         setIsRoosterJumping(false)
         setJumpAnimation(prev => ({ ...prev, isActive: false }))
-      }, 600 + 150) // +150ms для anticipation
+      }, missDuration + 150)
     }
-  }, [isListening, platforms, isLockedOnPlatform, roosterPosition, createSmoothJump, jumpAnimation.duration])
+  }, [isListening, platforms, isLockedOnPlatform, roosterPosition, createSmoothJump, jumpAnimation.duration, averageAudioInput])
 
-  // Обработка клавиатурного ввода
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (!isListening) return
+  // Убираем обработку клавиатурного ввода
+  // useEffect(() => {
+  //   const handleKeyDown = (event: KeyboardEvent) => {
+  //     if (!isListening) return
+  //     // ... весь код обработки клавиатуры удален
+  //   }
+  //   // ... остальной код удален
+  // }, [isListening, platforms, handleUserInput])
 
-      const key = event.key
-
-      // Добавляем визуальную обратную связь
-      setPressedKeys(prev => new Set(prev).add(key))
-
-      if (key >= '1' && key <= '8') {
-        const platformIndex = parseInt(key) - 1
-        const targetPlatform = platforms[platformIndex]
-        if (targetPlatform) {
-          handleUserInput(targetPlatform.note)
-        }
-      }
-
-      // Также можем добавить поддержку нот через клавиши
-      const noteKeyMap: { [key: string]: string } = {
-        'c': 'C',
-        'd': 'D',
-        'e': 'E',
-        'f': 'F',
-        'g': 'G',
-        'a': 'A',
-        'b': 'B',
-      }
-
-      const note = noteKeyMap[key.toLowerCase()]
-      if (note) {
-        // Попробуем найти ноту в любой октаве
-        const matchingNote = platforms.find(p => p.note.startsWith(note))?.note
-        if (matchingNote) {
-          handleUserInput(matchingNote)
-        }
-      }
-    }
-
-    const handleKeyUp = (event: KeyboardEvent) => {
-      setPressedKeys(prev => {
-        const newSet = new Set(prev)
-        newSet.delete(event.key)
-        return newSet
-      })
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
-    }
-  }, [isListening, platforms, handleUserInput])
-
-  // Обработка клика по платформам
-  const handleCanvasClick = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isListening) return
-
-    const canvas = canvasRef.current
-    if (!canvas) return
-
-    const rect = canvas.getBoundingClientRect()
-    const clickX = event.clientX - rect.left
-    const clickY = event.clientY - rect.top
-
-    // Находим платформу, по которой кликнули
-    const clickedPlatform = platforms.find(platform =>
-      clickX >= platform.x &&
-      clickX <= platform.x + platform.width &&
-      clickY >= platform.y &&
-      clickY <= platform.y + platform.height
-    )
-
-    if (clickedPlatform) {
-      handleUserInput(clickedPlatform.note)
-    }
-  }, [isListening, platforms, handleUserInput])
+  // Убираем обработку клика по платформам
+  // const handleCanvasClick = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
+  //   // ... весь код обработки кликов удален
+  // }, [isListening, platforms, handleUserInput])
 
   // Реакция на новый звук пользователя (сохраняем оригинальную функциональность)
   useEffect(() => {
@@ -505,7 +464,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         cancelAnimationFrame(animationId)
       }
     }
-  }, []) // Убираем зависимости, используем refs
+  }, [STAR_COLORS, STAR_SIZES, STAR_SPEEDS]) // Добавляем зависимости для звезд
 
   // Отрисовка
   useEffect(() => {
@@ -534,7 +493,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         const star = starField[l]?.[i]
         if (!star || typeof star.x !== 'number' || typeof star.y !== 'number') continue
         // Зацикленный параллакс
-        let x = (star.x + starParallax * STAR_SPEEDS[l]!) % CANVAS_WIDTH
+        let x = (star.x + starParallax * (STAR_SPEEDS[l] || 1)) % CANVAS_WIDTH
         if (x < 0) x += CANVAS_WIDTH
         ctx.beginPath()
         const size = STAR_SIZES[l] ?? 1
@@ -599,14 +558,14 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         className="platform-game-canvas"
         width={800}
         height={600}
-        onClick={handleCanvasClick}
+        // Убираем onClick={handleCanvasClick}
       />
       <div
         className="rooster-game-character"
         style={{
           position: 'absolute',
           left: roosterPosition.x,
-          top: roosterPosition.y - 100, // выше над платформой
+          top: roosterPosition.y - 100,
           transform: 'translate(-50%, 0)',
           zIndex: 100,
         }}
@@ -626,31 +585,10 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
             <span className="controls-hint-text">Sing or hum the melody</span>
           </div>
           <div className="controls-hint-row">
-            <span className="controls-hint-icon">⌨️</span>
+            <span className="controls-hint-icon">📊</span>
             <span className="controls-hint-text">
-              Press numbers:
-              {Array.from({ length: melodyLength }, (_, i) => (
-                <span
-                  key={i}
-                  className={`key-indicator ${pressedKeys.has((i + 1).toString()) ? 'pressed' : ''}`}
-                >
-                  {i + 1}
-                </span>
-              ))}
-              or notes:
-              {['C', 'D', 'E', 'F', 'G', 'A', 'B'].map(note => (
-                <span
-                  key={note}
-                  className={`key-indicator ${pressedKeys.has(note.toLowerCase()) ? 'pressed' : ''}`}
-                >
-                  {note}
-                </span>
-              ))}
+              Audio input: {averageAudioInput.toFixed(1)} Hz
             </span>
-          </div>
-          <div className="controls-hint-row">
-            <span className="controls-hint-icon">🖱️</span>
-            <span className="controls-hint-text">Click on platforms to jump</span>
           </div>
         </div>
       )}

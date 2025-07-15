@@ -12,11 +12,12 @@ import './UnifiedGamePage.css'
 
 export function UnifiedGamePage () {
   const [isPlaying, setIsPlaying] = useState(false)
-  const difficulty = useDifficultyStore((s: any) => s.difficulty)
-  const setDifficulty = useDifficultyStore((s: any) => s.setDifficulty)
+  const difficulty = useDifficultyStore((s) => s.difficulty)
+  const setDifficulty = useDifficultyStore((s) => s.setDifficulty)
 
   const {
     game,
+    averageAudioInput,
     playMelody,
     stopListening,
     replayMelody,
@@ -75,6 +76,7 @@ export function UnifiedGamePage () {
               currentNoteIndex={game.userInput.length}
               isListening={game.state === 'listening'}
               melodyNotes={melodyNotes}
+              averageAudioInput={averageAudioInput}
             />
             <div className="unified-game-playing-controls">
               {game.state === 'listening' && (
