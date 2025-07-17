@@ -4,7 +4,6 @@ import { getMelodyNotes } from '../entities/melody/model/melody'
 import { ScorePanel } from '../widgets/score-panel'
 import { PlatformGame } from '../widgets/platform-game'
 import { Button } from '../shared/ui/Button'
-import { RoosterIcon } from '../shared/ui/RoosterIcon'
 import { DIFFICULTY_LEVELS } from '../shared/config/constants'
 import { useDifficultyStore } from '../shared/store/difficulty-store'
 import { Difficulty } from '../shared/types'
@@ -12,11 +11,12 @@ import './UnifiedGamePage.css'
 
 export function UnifiedGamePage () {
   const [isPlaying, setIsPlaying] = useState(false)
-  const difficulty = useDifficultyStore((s: any) => s.difficulty)
-  const setDifficulty = useDifficultyStore((s: any) => s.setDifficulty)
+  const difficulty = useDifficultyStore((s) => s.difficulty)
+  const setDifficulty = useDifficultyStore((s) => s.setDifficulty)
 
   const {
     game,
+    averageAudioInput,
     playMelody,
     stopListening,
     replayMelody,
@@ -60,7 +60,6 @@ export function UnifiedGamePage () {
             ← Back
           </button>
           <div className="fullscreen-header">
-            <RoosterIcon width={64} height={48} jumping={game.state === 'playing'} />
             <h1 className="fullscreen-title">Ear Warrior</h1>
             <div className="fullscreen-subtitle">Train Your Musical Ear</div>
             <div className="fullscreen-score-panel-wrapper">
@@ -75,6 +74,7 @@ export function UnifiedGamePage () {
               currentNoteIndex={game.userInput.length}
               isListening={game.state === 'listening'}
               melodyNotes={melodyNotes}
+              averageAudioInput={averageAudioInput}
             />
             <div className="unified-game-playing-controls">
               {game.state === 'listening' && (
@@ -103,7 +103,6 @@ export function UnifiedGamePage () {
       {!isPlaying && (
         <div className="unified-game-container">
           <div className="unified-game-header">
-            <RoosterIcon width={48} height={36} jumping={game.state === 'playing'} />
             <h1 className="unified-game-title">Ear Warrior</h1>
             <div className="unified-game-subtitle">Train Your Musical Ear</div>
           </div>

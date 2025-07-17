@@ -19,5 +19,3 @@ Any feature or bugfix without meaningful tests is incomplete by default.
 	10.	Tests are documentation
 Future devs (including you) will understand behavior by reading tests. Write them like you mean it.
 Any feature or bugfix without meaningful tests is incomplete by default.
-	10.	Tests are documentation
-Future devs (including you) will understand behavior by reading tests. Write them like you mean it.
