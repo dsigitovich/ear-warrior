@@ -47,6 +47,33 @@ The synthesizer uses polyphonic synthesis with:
 
 ---
 
+## 🌌 Audio Visualization
+
+Experience immersive real-time audio visualization while training your ear! The sky reacts beautifully to your voice and singing.
+
+### Visual Effects
+
+- **🎨 Dynamic Sky Colors**: Sky gradient changes based on audio frequency - low notes create purple/magenta hues, high notes create blue/green colors
+- **✨ Aurora Borealis**: Northern lights effect that dances with your voice intensity
+- **⭐ Reactive Stars**: Stars that twinkle, grow, and glow in sync with your audio input
+- **🎵 Smooth Transitions**: Effects smoothly fade in and out as you start and stop singing
+
+### How It Works
+
+1. **Start Playing**: Click "Play Melody" to begin a training session
+2. **Sing Along**: When recording starts, the sky immediately responds to your voice
+3. **Watch the Magic**: Lower frequencies create warmer colors, higher frequencies create cooler colors
+4. **Aurora Effect**: Sing loudly to trigger the beautiful Aurora Borealis effect in the sky
+
+### Technical Features
+
+- Real-time frequency analysis (80-1000 Hz musical range)
+- 60fps smooth animations synchronized with audio
+- HSL color space for natural color transitions
+- Canvas-based rendering for optimal performance
+
+---
+
 ## 📋 Project Overview
 
 **Ear Warrior** is an interactive web-based musical ear training game that helps users develop pitch recognition and melodic memory skills through real-time audio feedback and gamified learning experiences.
@@ -58,6 +85,7 @@ The synthesizer uses polyphonic synthesis with:
 - **Scoring System** - Rewards for correct answers and streaks
 - **Progressive Difficulty** - 4 difficulty levels from beginner to advanced
 - **Visual Feedback** - Animated interface with rooster character
+- **🌌 Audio Visualization** - Real-time sky visualization that reacts to your voice
 - **Analog Synthesizer** - Built-in analog synthesizer with multiple presets
 
 ## 🏗️ Project Architecture
