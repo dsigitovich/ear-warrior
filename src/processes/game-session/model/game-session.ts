@@ -26,6 +26,7 @@ export function useGameSession () {
   const recordingStartTimeRef = useRef<number | null>(null)
   const accumulatedFrequenciesRef = useRef<number[]>([])
   const recordingTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const startRecordingPeriodRef = useRef<(() => void) | null>(null)
 
   // Update ref on every render
   gameMelodyRef.current = game.currentMelody
@@ -46,7 +47,7 @@ export function useGameSession () {
     accumulatedFrequenciesRef.current = []
   }, [])
 
-  function finishRecordingPeriod () {
+  const finishRecordingPeriod = useCallback(() => {
     const averageFrequency = calculateAverageFrequency(accumulatedFrequenciesRef.current)
 
     if (averageFrequency) {
@@ -82,7 +83,7 @@ export function useGameSession () {
               setTimeout(() => setGame(prev => setFeedback(prev, null)), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
               replayMelody()
               setTimeout(() => {
-                startRecordingPeriod()
+                startRecordingPeriodRef.current?.()
                 isProcessingRef.current = false
               }, 700)
               return { ...newGame, attemptsLeft: attempts }
@@ -102,7 +103,7 @@ export function useGameSession () {
           }
 
           setTimeout(() => {
-            startRecordingPeriod()
+            startRecordingPeriodRef.current?.()
             isProcessingRef.current = false
           }, 100)
 
@@ -112,13 +113,13 @@ export function useGameSession () {
     } else {
       setAverageAudioInput(0)
       setTimeout(() => {
-        startRecordingPeriod()
+        startRecordingPeriodRef.current?.()
       }, 100)
     }
     recordingTimeoutRef.current = null
-  }
+  }, [])
 
-  function startRecordingPeriod () {
+  const startRecordingPeriod = useCallback(() => {
     recordingStartTimeRef.current = Date.now()
     accumulatedFrequenciesRef.current = []
     if (recordingTimeoutRef.current) {
@@ -127,7 +128,10 @@ export function useGameSession () {
     recordingTimeoutRef.current = setTimeout(() => {
       finishRecordingPeriod()
     }, AUDIO_CONFIG.RECORDING_DURATION)
-  }
+  }, [finishRecordingPeriod])
+
+  // Assign the ref to break circular dependency
+  startRecordingPeriodRef.current = startRecordingPeriod
 
   const stopListening = useCallback(() => {
     setGame(prev => setGameState(prev, 'idle'))
