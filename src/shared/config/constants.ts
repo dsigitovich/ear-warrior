@@ -35,12 +35,12 @@ export const AUDIO_CONFIG = {
   MIN_RMS: 0.01,
   NOTE_DURATION: '0.5n',
   NOTE_INTERVAL: 0.6,
-  RECORDING_DURATION: 1000, // 1 second in milliseconds
+  RECORDING_DURATION: 100, // Reduced from 1000ms to 100ms for faster input response
 } as const
 
 export const GAME_CONFIG = {
   SUCCESS_SCORE_MULTIPLIER: 10,
-  FEEDBACK_DURATION: 2000,
-  SUCCESS_DELAY: 1000,
-  ERROR_FEEDBACK_DURATION: 1500,
+  FEEDBACK_DURATION: 500, // Reduced from 2000ms to 500ms
+  SUCCESS_DELAY: 200, // Reduced from 1000ms to 200ms
+  ERROR_FEEDBACK_DURATION: 500, // Reduced from 1500ms to 500ms
 } as const

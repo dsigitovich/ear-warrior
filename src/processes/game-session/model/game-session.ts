@@ -82,7 +82,7 @@ export function useGameSession () {
               setTimeout(() => stopListening(), GAME_CONFIG.ERROR_FEEDBACK_DURATION)
               setTimeout(() => {
                 isProcessingRef.current = false
-              }, 700)
+              }, 200) // Reduced from 700ms
               return { ...resetGameInput(newGame), attemptsLeft: 0 }
             } else {
               setGame(prev => setFeedback(prev, 'Try again!'))
@@ -92,7 +92,7 @@ export function useGameSession () {
               setTimeout(() => {
                 startRecordingPeriod()
                 isProcessingRef.current = false
-              }, 700)
+              }, 200) // Reduced from 700ms
               return { ...newGame, attemptsLeft: attempts }
             }
           }
@@ -105,7 +105,7 @@ export function useGameSession () {
             setTimeout(() => stopListening(), GAME_CONFIG.SUCCESS_DELAY)
             setTimeout(() => {
               isProcessingRef.current = false
-            }, 700)
+            }, 200) // Reduced from 700ms
             return { ...updatedGame, attemptsLeft: 3 }
           }
 
@@ -113,7 +113,7 @@ export function useGameSession () {
           setTimeout(() => {
             startRecordingPeriod()
             isProcessingRef.current = false
-          }, 100)
+          }, 50) // Reduced from 100ms
 
           return { ...updatedGame, attemptsLeft: attempts }
         })
@@ -122,7 +122,7 @@ export function useGameSession () {
       // No valid frequency detected, start new recording period
       setTimeout(() => {
         startRecordingPeriod()
-      }, 100)
+      }, 50) // Reduced from 100ms
     }
 
     // Clear timeout reference
