@@ -15,37 +15,49 @@ export function RoosterIcon ({ width = 64, height = 64, jumping = false }: { wid
             transform: translateY(0) scaleY(1) scaleX(1) rotate(0deg); 
           }
           /* Anticipation - подготовка к прыжку */
-          8% { 
-            transform: translateY(4px) scaleY(0.8) scaleX(1.15) rotate(-2deg); 
+          5% { 
+            transform: translateY(1px) scaleY(0.95) scaleX(1.05) rotate(-0.5deg); 
+          }
+          10% { 
+            transform: translateY(3px) scaleY(0.85) scaleX(1.12) rotate(-1.5deg); 
           }
           /* Start of jump - начало прыжка */
-          15% { 
-            transform: translateY(-12px) scaleY(1.1) scaleX(0.9) rotate(3deg); 
+          18% { 
+            transform: translateY(-8px) scaleY(1.08) scaleX(0.92) rotate(2deg); 
           }
           /* Rising - подъем */
-          25% { 
-            transform: translateY(-28px) scaleY(1.05) scaleX(0.95) rotate(5deg); } /* Peak - пик прыжка */ 40% { 
-            transform: translateY(-42px) scaleY(0.95) scaleX(1.05) rotate(3deg); 
+          28% { 
+            transform: translateY(-22px) scaleY(1.04) scaleX(0.96) rotate(4deg); 
+          }
+          35% { 
+            transform: translateY(-32px) scaleY(1.02) scaleX(0.98) rotate(4.5deg); 
+          }
+          /* Peak - пик прыжка */ 
+          45% { 
+            transform: translateY(-40px) scaleY(0.96) scaleX(1.04) rotate(3deg); 
           }
           /* Peak hold - удержание в пике */
-          50% { 
-            transform: translateY(-42px) scaleY(0.93) scaleX(1.07) rotate(1deg); 
+          55% { 
+            transform: translateY(-40px) scaleY(0.94) scaleX(1.06) rotate(1deg); 
           }
           /* Falling - падение */
           65% { 
-            transform: translateY(-28px) scaleY(1.02) scaleX(0.98) rotate(-2deg); 
+            transform: translateY(-32px) scaleY(1.01) scaleX(0.99) rotate(-1deg); 
+          }
+          75% { 
+            transform: translateY(-18px) scaleY(1.06) scaleX(0.94) rotate(-3deg); 
           }
           /* Approaching ground - приближение к земле */
-          80% { 
-            transform: translateY(-8px) scaleY(1.08) scaleX(0.92) rotate(-4deg); 
+          85% { 
+            transform: translateY(-5px) scaleY(1.12) scaleX(0.88) rotate(-3.5deg); 
           }
           /* Landing preparation - подготовка к приземлению */
-          90% { 
-            transform: translateY(2px) scaleY(0.75) scaleX(1.25) rotate(-1deg); 
+          92% { 
+            transform: translateY(1px) scaleY(0.8) scaleX(1.2) rotate(-0.5deg); 
           }
           /* Bounce back - отскок */
-          95% { 
-            transform: translateY(-4px) scaleY(1.1) scaleX(0.9) rotate(1deg); 
+          96% { 
+            transform: translateY(-3px) scaleY(1.08) scaleX(0.92) rotate(0.5deg); 
           }
           /* Settle - успокоение */
           100% { 
@@ -58,31 +70,34 @@ export function RoosterIcon ({ width = 64, height = 64, jumping = false }: { wid
             transform: scaleY(1) scaleX(1) rotate(0deg); 
           }
           25% { 
-            transform: scaleY(1.02) scaleX(0.98) rotate(0.5deg); 
+            transform: scaleY(1.015) scaleX(0.985) rotate(0.3deg); 
           }
           50% { 
-            transform: scaleY(0.98) scaleX(1.02) rotate(0deg); 
+            transform: scaleY(0.985) scaleX(1.015) rotate(0deg); 
           }
           75% { 
-            transform: scaleY(1.01) scaleX(0.99) rotate(-0.5deg); 
+            transform: scaleY(1.008) scaleX(0.992) rotate(-0.3deg); 
           }
         }
 
         @keyframes roosterLanding {
           0% { 
-            transform: translateY(-8px) scaleY(1.1) scaleX(0.9) rotate(2deg); 
+            transform: translateY(-6px) scaleY(1.08) scaleX(0.92) rotate(1.5deg); 
           }
-          20% { 
-            transform: translateY(3px) scaleY(0.7) scaleX(1.3) rotate(-1deg); 
+          15% { 
+            transform: translateY(2px) scaleY(0.75) scaleX(1.25) rotate(-0.8deg); 
           }
-          40% { 
-            transform: translateY(-2px) scaleY(1.15) scaleX(0.85) rotate(0.5deg); 
+          30% { 
+            transform: translateY(-1.5px) scaleY(1.12) scaleX(0.88) rotate(0.4deg); 
           }
-          60% { 
-            transform: translateY(1px) scaleY(0.9) scaleX(1.1) rotate(-0.3deg); 
+          50% { 
+            transform: translateY(0.8px) scaleY(0.92) scaleX(1.08) rotate(-0.2deg); 
           }
-          80% { 
-            transform: translateY(-1px) scaleY(1.05) scaleX(0.95) rotate(0.1deg); 
+          70% { 
+            transform: translateY(-0.8px) scaleY(1.04) scaleX(0.96) rotate(0.1deg); 
+          }
+          85% { 
+            transform: translateY(0.3px) scaleY(0.98) scaleX(1.02) rotate(-0.05deg); 
           }
           100% { 
             transform: translateY(0) scaleY(1) scaleX(1) rotate(0deg); 
@@ -103,10 +118,10 @@ export function RoosterIcon ({ width = 64, height = 64, jumping = false }: { wid
       aria-label="Rooster logo"
       role="img"
       style={jumping ? {
-        animation: 'jumpMarioRooster 0.8s cubic-bezier(0.23, 1, 0.32, 1)',
+        animation: 'jumpMarioRooster 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         transformOrigin: 'center bottom'
       } : {
-        animation: 'roosterIdle 3s ease-in-out infinite',
+        animation: 'roosterIdle 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         transformOrigin: 'center bottom'
       }}
     >

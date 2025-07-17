@@ -12,6 +12,7 @@ import './UnifiedGamePage.css'
 
 export function UnifiedGamePage () {
   const [isPlaying, setIsPlaying] = useState(false)
+  const [roosterIsJumping, setRoosterIsJumping] = useState(false)
   const difficulty = useDifficultyStore((s: any) => s.difficulty)
   const setDifficulty = useDifficultyStore((s: any) => s.setDifficulty)
 
@@ -23,6 +24,23 @@ export function UnifiedGamePage () {
   } = useGameSession()
 
   const melodyNotes = game.currentMelody ? getMelodyNotes(game.currentMelody) : []
+
+  // Управляем анимацией петуха более точно
+  useEffect(() => {
+    if (game.state === 'playing') {
+      // Анимация только в момент начала проигрывания мелодии
+      setRoosterIsJumping(true)
+      const timer = setTimeout(() => setRoosterIsJumping(false), 1500)
+      return () => clearTimeout(timer)
+    } else if (game.state === 'listening' && game.detectedNote) {
+      // Короткая анимация при обнаружении ноты
+      setRoosterIsJumping(true)
+      const timer = setTimeout(() => setRoosterIsJumping(false), 800)
+      return () => clearTimeout(timer)
+    } else {
+      setRoosterIsJumping(false)
+    }
+  }, [game.state, game.detectedNote])
 
   const handlePlayAgain = () => {
     setIsPlaying(true)
@@ -60,7 +78,7 @@ export function UnifiedGamePage () {
             ← Back
           </button>
           <div className="fullscreen-header">
-            <RoosterIcon width={64} height={48} jumping={game.state === 'playing'} />
+            <RoosterIcon width={64} height={48} jumping={roosterIsJumping} />
             <h1 className="fullscreen-title">Ear Warrior</h1>
             <div className="fullscreen-subtitle">Train Your Musical Ear</div>
             <div className="fullscreen-score-panel-wrapper">
@@ -103,7 +121,7 @@ export function UnifiedGamePage () {
       {!isPlaying && (
         <div className="unified-game-container">
           <div className="unified-game-header">
-            <RoosterIcon width={48} height={36} jumping={game.state === 'playing'} />
+            <RoosterIcon width={48} height={36} jumping={roosterIsJumping} />
             <h1 className="unified-game-title">Ear Warrior</h1>
             <div className="unified-game-subtitle">Train Your Musical Ear</div>
           </div>

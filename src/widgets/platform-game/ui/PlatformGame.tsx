@@ -71,6 +71,9 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
     easeType: 'success',
   })
 
+  // Добавляем состояние для плавного перехода анимаций
+  const [animationTransition, setAnimationTransition] = useState(false)
+
   // Используем refs для стабильных ссылок на данные
   const platformsRef = useRef<Platform[]>([])
   const jumpAnimationRef = useRef<JumpAnimation>(jumpAnimation)
@@ -185,7 +188,11 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
   const createSmoothJump = useCallback((startX: number, startY: number, targetX: number, targetY: number, isSuccess: boolean = true) => {
     const distance = Math.abs(targetX - startX)
     const jumpHeight = isSuccess ? Math.max(100, distance * 0.4) : 60 // Выше прыжок для успешных попаданий
-    const duration = isSuccess ? Math.max(1000, distance * 1.8) : 600 // Дольше для успешных прыжков
+    const duration = isSuccess ? Math.max(1200, distance * 2) : 800 // Увеличена длительность для плавности
+
+    // Плавный переход к состоянию anticipation
+    setAnimationTransition(true)
+    setTimeout(() => setAnimationTransition(false), 50)
 
     // Добавляем anticipation (подготовку к прыжку)
     setRoosterState(prev => ({
@@ -194,7 +201,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
       anticipationStartTime: Date.now(),
     }))
 
-    // Запускаем прыжок с небольшой задержкой для anticipation
+    // Запускаем прыжок с увеличенной задержкой для более плавной anticipation
     setTimeout(() => {
       setJumpAnimation({
         isActive: true,
@@ -211,7 +218,7 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         ...prev,
         isAnticipating: false,
       }))
-    }, 150) // 150ms anticipation
+    }, 200) // Увеличена anticipation до 200ms для плавности
   }, [])
 
   // Универсальная функция для обработки пользовательского ввода
@@ -232,15 +239,22 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
 
       if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
       jumpTimeoutRef.current = setTimeout(() => {
-        setIsRoosterJumping(false)
-        setJumpAnimation(prev => ({ ...prev, isActive: false }))
-        // Добавляем эффект приземления
-        setRoosterState(prev => ({
-          ...prev,
-          isLanding: true,
-          landingStartTime: Date.now(),
-        }))
-      }, jumpAnimation.duration + 150) // +150ms для anticipation
+        // Плавное завершение прыжка
+        setAnimationTransition(true)
+        setTimeout(() => {
+          setIsRoosterJumping(false)
+          setJumpAnimation(prev => ({ ...prev, isActive: false }))
+          // Добавляем эффект приземления с задержкой
+          setTimeout(() => {
+            setRoosterState(prev => ({
+              ...prev,
+              isLanding: true,
+              landingStartTime: Date.now(),
+            }))
+          }, 100)
+          setAnimationTransition(false)
+        }, 50)
+      }, jumpAnimation.duration + 200) // Увеличена задержка
 
     } else if (!isLockedOnPlatform) {
       // Неправильная нота - небольшой прыжок на месте
@@ -248,9 +262,13 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
       setIsRoosterJumping(true)
       if (jumpTimeoutRef.current) clearTimeout(jumpTimeoutRef.current)
       jumpTimeoutRef.current = setTimeout(() => {
-        setIsRoosterJumping(false)
-        setJumpAnimation(prev => ({ ...prev, isActive: false }))
-      }, 600 + 150) // +150ms для anticipation
+        setAnimationTransition(true)
+        setTimeout(() => {
+          setIsRoosterJumping(false)
+          setJumpAnimation(prev => ({ ...prev, isActive: false }))
+          setAnimationTransition(false)
+        }, 50)
+      }, 800 + 200) // Увеличена длительность для плавности
     }
   }, [isListening, platforms, isLockedOnPlatform, roosterPosition, createSmoothJump, jumpAnimation.duration])
 
@@ -602,20 +620,25 @@ export const PlatformGame: React.FC<PlatformGameProps> = ({
         onClick={handleCanvasClick}
       />
       <div
-        className="rooster-game-character"
+        className={`rooster-game-character ${
+          isRoosterJumping ? 'jumping' : ''
+        } ${roosterState.isAnticipating ? 'anticipating' : ''} ${
+          roosterState.isLanding ? 'landing' : ''
+        } ${!isRoosterJumping && !roosterState.isAnticipating && !roosterState.isLanding ? 'idle' : ''}`}
         style={{
           position: 'absolute',
           left: roosterPosition.x,
-          top: roosterPosition.y - 100, // выше над платформой
+          top: roosterPosition.y,
           transform: 'translate(-50%, 0)',
           zIndex: 100,
+          transition: animationTransition ? 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none',
         }}
       >
         <div style={{ transform: 'scaleX(-1)' }}>
           <RoosterIcon
             width={64}
             height={64}
-            jumping={isRoosterJumping || roosterState.isAnticipating}
+            jumping={isRoosterJumping && !roosterState.isAnticipating}
           />
         </div>
       </div>
