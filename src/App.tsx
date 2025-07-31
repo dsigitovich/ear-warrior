@@ -1,10 +1,14 @@
 import React from 'react'
-import { UnifiedGamePage } from './pages/UnifiedGamePage'
 import './App.css'
 
 const App: React.FC = () => {
   return (
-    <UnifiedGamePage />
+    <div className="App">
+      <header className="App-header">
+        <h1>Ear Warrior</h1>
+        <p>Welcome to Ear Warrior - A Musical Training Game</p>
+      </header>
+    </div>
   )
 }
 
