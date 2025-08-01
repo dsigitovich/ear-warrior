@@ -92,11 +92,14 @@ export const useGameStore = create<GameState>((set, get) => ({
   ...getInitialState(),
 
   startGame: () => {
+    const currentState = get()
+    const gameDifficulty = currentState.selectedDifficulty || currentState.difficulty
+
     set({
       isGameStarted: true,
       isGamePaused: false,
       isGameOver: false,
-      difficulty: 'intermediate', // Устанавливаем дефолтную сложность
+      difficulty: gameDifficulty,
       score: 0,
       currentStreak: 0,
       currentLevel: 1,
@@ -137,7 +140,10 @@ export const useGameStore = create<GameState>((set, get) => ({
 
   setDifficulty: (difficulty: Difficulty) => set({ difficulty }),
 
-  selectDifficulty: (difficulty: Difficulty) => set({ selectedDifficulty: difficulty }),
+  selectDifficulty: (difficulty: Difficulty) => set({
+    selectedDifficulty: difficulty,
+    difficulty: difficulty
+  }),
 
   updateScore: (points: number) => {
     const { score } = get()
