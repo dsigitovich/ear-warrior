@@ -9,4 +9,11 @@ module.exports = {
     '<rootDir>/src/**/*.{test,spec}.{ts,tsx}',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+<<<<<<< Current (Your changes)
+=======
+  moduleNameMapper: {
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy'
+  },
+  setupFilesAfterEnv: ['<rootDir>/src/setupTests.ts']
+>>>>>>> Incoming (Background Agent changes)
 } 
