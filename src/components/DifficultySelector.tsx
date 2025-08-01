@@ -7,7 +7,7 @@ export interface DifficultySelectorProps {
 }
 
 export const DifficultySelector: React.FC<DifficultySelectorProps> = ({ className = '' }) => {
-  const { setDifficulty, difficulty } = useGameStore()
+  const { selectDifficulty, difficulty } = useGameStore()
 
   const difficulties = [
     { id: 'beginner', name: 'Beginner', description: 'Simple melodies, 3-4 notes', color: '#4CAF50' },
@@ -24,7 +24,7 @@ export const DifficultySelector: React.FC<DifficultySelectorProps> = ({ classNam
           <button
             key={level.id}
             className={`difficulty-card ${difficulty === level.id ? 'selected' : ''}`}
-            onClick={() => setDifficulty(level.id as Difficulty)}
+            onClick={() => selectDifficulty(level.id as Difficulty)}
             style={{ '--accent-color': level.color } as React.CSSProperties}
           >
             <div className="difficulty-icon">

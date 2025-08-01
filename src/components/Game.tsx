@@ -12,6 +12,7 @@ export const Game: React.FC<GameProps> = ({ className = '' }) => {
     isGameStarted,
     isGamePaused,
     difficulty,
+    selectedDifficulty,
     currentLevel,
     timeRemaining,
     currentStreak,
@@ -288,7 +289,7 @@ export const Game: React.FC<GameProps> = ({ className = '' }) => {
 
   // Handle game start
   const handleStartGame = () => {
-    if (!difficulty) {
+    if (!selectedDifficulty) {
       setFeedback('Please select a difficulty level first!')
       setFeedbackType('error')
       return
@@ -317,7 +318,7 @@ export const Game: React.FC<GameProps> = ({ className = '' }) => {
           <button
             className="start-button"
             onClick={handleStartGame}
-            disabled={!difficulty}
+            disabled={!selectedDifficulty}
           >
             🎵 Start Game
           </button>
