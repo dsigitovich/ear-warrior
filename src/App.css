@@ -220,7 +220,8 @@ body {
 <<<<<<< Current (Your changes)
 input[type="range"] {
   accent-color: #43cea2;
-=======
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .app-header {
@@ -316,5 +317,4 @@ button:focus-visible {
   .welcome-title {
     -webkit-text-fill-color: #fff;
   }
->>>>>>> Incoming (Background Agent changes)
 }

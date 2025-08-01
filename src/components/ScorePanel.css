@@ -1,1 +1,216 @@
- 
+.score-panel {
+  margin-bottom: 2rem;
+}
+
+.score-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.score-card {
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.score-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.score-card:hover::before {
+  opacity: 1;
+}
+
+.score-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Card variants */
+.score-card.primary {
+  border-color: #4CAF50;
+}
+
+.score-card.secondary {
+  border-color: #FF9800;
+}
+
+.score-card.accent {
+  border-color: #F44336;
+}
+
+.score-card.info {
+  border-color: #2196F3;
+}
+
+.score-card.progress {
+  border-color: #9C27B0;
+}
+
+.score-card.timer {
+  border-color: #FF5722;
+}
+
+.score-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.score-card:hover .score-icon {
+  transform: scale(1.1);
+}
+
+.score-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.score-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #ccc;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.score-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.multiplier {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 107, 53, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.8);
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .score-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.8rem;
+  }
+  
+  .score-card {
+    padding: 1rem;
+  }
+  
+  .score-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+  
+  .score-value {
+    font-size: 1.4rem;
+  }
+  
+  .score-label {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .score-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .score-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .score-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+  
+  .score-value {
+    font-size: 1.2rem;
+  }
+}
+
+/* Animation for score updates */
+@keyframes score-update {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.score-value.updated {
+  animation: score-update 0.3s ease;
+}
+
+/* Focus styles for accessibility */
+.score-card:focus {
+  outline: 2px solid #ff6b35;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .score-card {
+    border-width: 3px;
+  }
+  
+  .score-value {
+    color: #000;
+  }
+  
+  .score-label {
+    color: #333;
+  }
+} 
