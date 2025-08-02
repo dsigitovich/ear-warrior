@@ -3,11 +3,15 @@ import './App.css'
 
 const App: React.FC = () => {
   return (
-    <div className="App app-flex">
-      <header className="App-header header-centered">
+    <div className="App app-flex main-container">
+      <div className="title">
         Ear Warrior
-      </header>
-      <p>Welcome to Ear Warrior - A Musical Training Game</p>
+      </div>
+      <p className="welcome-message">
+        Welcome to Ear Warrior - A Musical Training Game
+      </p>
+      <div className="content-wrapper">
+      </div>
     </div>
   )
 }
