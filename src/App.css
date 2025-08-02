@@ -154,3 +154,12 @@ select {
 input[type="range"] {
   accent-color: #43cea2;
 }
+
+.app-flex {
+  display: flex;
+  flex-direction: column;
+}
+
+.header-centered {
+  margin: 0 auto;
+}
