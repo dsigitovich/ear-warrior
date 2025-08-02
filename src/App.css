@@ -169,10 +169,27 @@ input[type="range"] {
   font: 400 16px "Press Start 2P", Arial, sans-serif;
 }
 
+.outer-container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  font-weight: 400;
+  justify-content: center;
+  min-height: 713px;
+  pointer-events: auto;
+}
+
+.inner-container {
+  display: flex;
+  flex-direction: column;
+  font-weight: 400;
+  pointer-events: auto;
+}
+
 .title {
   font-weight: 400;
   pointer-events: auto;
-  margin-top: 20px;
+  margin: 20px auto 0;
 }
 
 .welcome-message {
